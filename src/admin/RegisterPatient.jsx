@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { addPatient, addVisit, findPatientByPhone, today } from "../db";
-import VisitFields, { emptyVisit } from "../components/VisitFields";
+import VisitFields, { emptyVisit } from "./VisitFields";
 
 const emptyPatient = () => ({ name: "", age: "", phone: "", address: "" });
 
@@ -88,7 +88,7 @@ export default function RegisterPatient() {
 
       {msg && (
         <p className={msg.type === "ok" ? "success" : "error"}>
-          {msg.text}{msg.patientId && <> · <Link to={`/patients/${msg.patientId}`}>فتح ملف المريض</Link></>}
+          {msg.text}{msg.patientId && <> · <Link to={`/admin/patients/${msg.patientId}`}>فتح ملف المريض</Link></>}
         </p>
       )}
       <button className="btn" disabled={busy}>{busy ? "جاري الحفظ..." : "تسجيل"}</button>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { balancesByPatient, getPatients, getPayments, getVisits, money } from "../db";
-import useLoad from "../components/useLoad";
+import useLoad from "./useLoad";
 
 export default function Patients() {
   const [search, setSearch] = useState("");
@@ -28,7 +28,7 @@ export default function Patients() {
     <div className="card">
       <div className="row between">
         <h2>المرضى ({rows.length})</h2>
-        <Link className="btn" to="/register">+ مريض جديد</Link>
+        <Link className="btn" to="/admin/register">+ مريض جديد</Link>
       </div>
       <div className="row">
         <input placeholder="ابحث بالاسم أو الموبايل" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -40,7 +40,7 @@ export default function Patients() {
           <tbody>
             {rows.map((p) => (
               <tr key={p.id}>
-                <td><Link to={`/patients/${p.id}`}>{p.name}</Link></td>
+                <td><Link to={`/admin/patients/${p.id}`}>{p.name}</Link></td>
                 <td dir="ltr">{p.phone}</td>
                 <td>{p.age ?? "-"}</td>
                 <td className={p.balance > 0 ? "warn" : ""}>{money(p.balance)}</td>

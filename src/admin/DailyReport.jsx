@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { byNewest, getPaymentsOn, getVisitsOn, money, today } from "../db";
 import { DOCTORS } from "../config";
-import useLoad from "../components/useLoad";
+import useLoad from "./useLoad";
 
 export default function DailyReport() {
   const [date, setDate] = useState(today());

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { addPayment, addVisit, byNewest, getPatient, getPayments, getVisits, money, today } from "../db";
-import useLoad from "../components/useLoad";
-import VisitFields, { emptyVisit } from "../components/VisitFields";
+import useLoad from "./useLoad";
+import VisitFields, { emptyVisit } from "./VisitFields";
 
 export default function PatientDetail() {
   const { id } = useParams();

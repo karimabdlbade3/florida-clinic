@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { balancesByPatient, getPayments, getVisits, money, today } from "../db";
-import useLoad from "../components/useLoad";
+import useLoad from "./useLoad";
 
 export default function Dashboard() {
   const { data, error } = useLoad(async () => {
@@ -33,9 +33,9 @@ export default function Dashboard() {
         <div className="stat warn"><span>فلوس برا ({data.debtors} مريض)</span><strong>{money(data.outstanding)}</strong></div>
       </div>
       <div className="row">
-        <Link className="btn" to="/register">+ تسجيل مريض</Link>
-        <Link className="btn ghost" to="/patients">المرضى</Link>
-        <Link className="btn ghost" to="/report">تقرير اليوم</Link>
+        <Link className="btn" to="/admin/register">+ تسجيل مريض</Link>
+        <Link className="btn ghost" to="/admin/patients">المرضى</Link>
+        <Link className="btn ghost" to="/admin/report">تقرير اليوم</Link>
       </div>
     </>
   );
