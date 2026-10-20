@@ -69,7 +69,7 @@ function Footer() {
         <div>
           <h4>&nbsp;</h4>
           <ul className="s-footer-list">
-            <li><a href={`tel:${SITE.footerPhones[0]}`}><Phone width="16" height="16" /><span dir="ltr">{SITE.footerPhones.join(" / ")}</span></a></li>
+            <li><a href={`tel:${SITE.phones[0]}`}><Phone width="16" height="16" /><span dir="ltr">{SITE.phones.join(" / ")}</span></a></li>
             <li><a href={whatsappLink()} target="_blank" rel="noreferrer"><Whatsapp width="16" height="16" /><span dir="ltr">{SITE.whatsapp}</span></a></li>
             <li><a href={SITE.facebook} target="_blank" rel="noreferrer"><Facebook width="16" height="16" />{SITE.facebookName}</a></li>
             <li><a href={SITE.instagram} target="_blank" rel="noreferrer"><Instagram width="16" height="16" />{SITE.instagramName}</a></li>

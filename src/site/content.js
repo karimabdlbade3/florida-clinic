@@ -4,7 +4,6 @@ export const SITE = {
   tagline: "لطب وتجميل الأسنان",
   whatsapp: "01012396044",
   phones: ["01148770555", "01554368176"],
-  footerPhones: ["01554368170", "01148770555"],
   email: "floridadentalclinics37@gmail.com",
   facebook: "https://www.facebook.com/", // TODO: حط رابط صفحة الفيسبوك
   facebookName: "Florida Dental Clinics",
