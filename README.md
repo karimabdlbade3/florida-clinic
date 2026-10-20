@@ -21,12 +21,12 @@ npm install
 npm run dev
 ```
 
-## خطوات لازم تتعمل مرة واحدة في Firebase Console (مشروع kufur-clinic)
+## إعداد Firebase (مرة واحدة)
 
-1. **Authentication** > Sign-in method > فعّل **Email/Password**.
-2. **Authentication** > Users > Add user: اعمل حساب لكل حد هيستخدم السيستم (الاستقبال، الدكاترة).
-3. **Firestore Database** > Rules: الصق محتوى ملف `firestore.rules` واضغط Publish.
-   ده أهم خطوة: من غيرها أي حد معاه رابط المشروع يقدر يقرا بيانات المرضى.
+في Firebase Console (مشروع kufur-clinic) > **Firestore Database** > Rules: الصق محتوى ملف `firestore.rules` واضغط Publish.
+
+> **تحذير:** السيستم من غير تسجيل دخول، يعني أي حد يوصل لرابط الموقع يقدر يشوف ويعدل ويمسح بيانات المرضى والحسابات.
+> ما تشاركش الرابط، وقبل ما تدخل بيانات مرضى حقيقية بكميات كبيرة رجّع تسجيل الدخول (موجود في تاريخ git).
 
 ## الرفع على النت (Firebase Hosting، مجاني للحجم ده)
 

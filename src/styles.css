@@ -49,8 +49,6 @@ h3 { margin: 20px 0 10px; font-size: 1.05rem; color: var(--primary-dark); }
   padding: 20px;
   margin-bottom: 16px;
 }
-.card.narrow { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; }
-.card.narrow h2, .card.narrow p { margin: 0; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
 .span2 { grid-column: 1 / -1; }
@@ -88,7 +86,6 @@ label.check input { width: auto; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn.ghost { background: transparent; color: var(--primary); }
 .btn.ghost:hover { background: #e7f3f5; }
-.topbar .btn { margin-top: 0; }
 .link { background: none; border: none; color: var(--primary); font: inherit; cursor: pointer; text-decoration: underline; padding: 0; }
 
 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }

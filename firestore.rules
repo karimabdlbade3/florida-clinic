@@ -1,9 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // أي حد مش عامل تسجيل دخول مش هيقدر يقرا أو يكتب بيانات المرضى
-    match /{document=**} {
-      allow read, write: if request.auth != null;
-    }
+    // مفيش تسجيل دخول (بقرار صاحب العيادة): أي حد معاه رابط الموقع يقدر يقرا ويكتب في الجداول دي.
+    // لما تحب تقفلها، رجّع تسجيل الدخول وغيّر الشرط لـ: if request.auth != null
+    match /patients/{id} { allow read, write: if true; }
+    match /visits/{id}   { allow read, write: if true; }
+    match /payments/{id} { allow read, write: if true; }
   }
 }
