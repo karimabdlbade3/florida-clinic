@@ -34,7 +34,6 @@ export const ABOUT =
 export const TEAM = [
   { name: "دكتور محمود عبدالبديع", role: "أخصائي تقويم وجراحة الأسنان", photo: "mahmoud.jpg" },
   { name: "دكتور عمر محمد حسن", role: "أخصائي تجميل الأسنان والتركيبات الثابتة", photo: "omar.jpg" },
-  { name: "دكتورة أشرقت أشرف", role: "أخصائي تجميل الأسنان وعلاج أسنان الأطفال", photo: "ashrakat.jpg" },
   { name: "مهندس كريم عبدالبديع", role: "مدير عيادات فلوريدا", photo: "karim.jpg" },
 ];
 
