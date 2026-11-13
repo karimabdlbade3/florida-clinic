@@ -17,6 +17,7 @@ interface Props { lang: Lang; branch: Branch }
 const { lang, branch: b } = Astro.props;
 const d = t(lang);
 const B = d.branches;
+const isFirst = b.opened === Math.min(...branches.map((x) => x.opened));
 const waMsg = `${d.whatsappDefault} ${b.name[lang]}`;
 const wa = whatsappLink(waMsg, b.whatsapp);
 const tel = telLink(b.phone);
@@ -37,7 +38,7 @@ const schema = [
 ];
 ---
 <BaseLayout lang={lang} title={b.seo.title[lang]} description={b.seo.description[lang]} schema={schema} waMessage={waMsg}>
-  <PageHero lang={lang} title={b.name[lang]} lead={b.intro[lang]} eyebrow={b.isMain ? B.main : `${b.locality[lang]}${lang === 'ar' ? '، ' : ', '}${b.region[lang]}`} crumbs={[{ label: B.title, href: routes.branches }, { label: b.name[lang] }]}>
+  <PageHero lang={lang} title={b.name[lang]} lead={b.intro[lang]} eyebrow={[B.opened(b.opened), isFirst && B.first, b.isMain && B.main].filter(Boolean).join(' · ')} crumbs={[{ label: B.title, href: routes.branches }, { label: b.name[lang] }]}>
     <div class="btn-row" style="margin-top:28px">
       <a class="btn" href={bookHref} data-track="book_click"><Icon name="calendar" />{d.cta.bookHere}</a>
       {wa && <a class="btn btn--outline" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>}

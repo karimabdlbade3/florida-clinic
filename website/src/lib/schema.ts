@@ -27,6 +27,7 @@ export function branchSchema(b: Branch, lang: Lang, siteUrl: URL) {
     ...(b.hours ? { openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: site.hours.schema.days, opens: site.hours.schema.opens, closes: site.hours.schema.closes }] } : {}),
     slogan: site.tagline[lang],
     ...(b.mapLink ? { hasMap: b.mapLink } : {}),
+    foundingDate: String(b.opened),
     medicalSpecialty: 'Dentistry',
   };
 }

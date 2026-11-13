@@ -83,7 +83,7 @@ export const services: Service[] = [
       ],
     },
     seo: {
-      title: { ar: 'تقويم الأسنان في الإبراهيمية والزقازيق وكفورنجم | عيادات فلوريدا', en: 'Orthodontics & Braces in Ibrahimia, Zagazig, Kafr Negm | Florida Dental' },
+      title: { ar: 'تقويم الأسنان في كفورنجم والإبراهيمية والزقازيق | عيادات فلوريدا', en: 'Orthodontics & Braces in Kafr Negm, Ibrahimia, Zagazig | Florida Dental' },
       description: {
         ar: 'تقويم الأسنان للأطفال والكبار في عيادات فلوريدا: علاج الازدحام والفراغات ومشاكل العضّة بخطة واضحة. اطلب موعد الكشف في أقرب فرع.',
         en: 'Orthodontic treatment for children and adults at Florida Dental Clinics: crowding, gaps and bite problems, with a clear plan. Request a consultation at your nearest branch.',
@@ -150,8 +150,8 @@ export const services: Service[] = [
     seo: {
       title: { ar: 'تجميل الأسنان وتبييضها والفينير | عيادات فلوريدا لطب وتقويم الأسنان', en: 'Cosmetic Dentistry, Whitening & Veneers | Florida Dental Clinics' },
       description: {
-        ar: 'تجميل الأسنان في عيادات فلوريدا: تبييض، فينير، حشوات تجميلية وتصميم ابتسامة طبيعية بعد فحص صحة الأسنان واللثة. فروع الإبراهيمية والزقازيق وكفورنجم.',
-        en: 'Cosmetic dentistry at Florida Dental Clinics: whitening, veneers, tooth-coloured fillings and natural smile design after a full check-up. Branches in Ibrahimia, Zagazig and Kafr Negm.',
+        ar: 'تجميل الأسنان في عيادات فلوريدا: تبييض، فينير، حشوات تجميلية وتصميم ابتسامة طبيعية بعد فحص صحة الأسنان واللثة. فروع كفورنجم والإبراهيمية والزقازيق.',
+        en: 'Cosmetic dentistry at Florida Dental Clinics: whitening, veneers, tooth-coloured fillings and natural smile design after a full check-up. Branches in Kafr Negm, Ibrahimia and Zagazig.',
       },
     },
   },
@@ -215,8 +215,8 @@ export const services: Service[] = [
     seo: {
       title: { ar: 'زراعة الأسنان في الشرقية | عيادات فلوريدا لطب وتقويم الأسنان', en: 'Dental Implants in Sharqia | Florida Dental Clinics' },
       description: {
-        ar: 'زراعة الأسنان في عيادات فلوريدا بعد تقييم دقيق للعظم واللثة والصحة العامة. تعويض ثابت للأسنان المفقودة. فروع الإبراهيمية والزقازيق وكفورنجم.',
-        en: 'Dental implants at Florida Dental Clinics, planned after careful assessment of bone, gums and general health. Fixed replacement for missing teeth in Ibrahimia, Zagazig and Kafr Negm.',
+        ar: 'زراعة الأسنان في عيادات فلوريدا بعد تقييم دقيق للعظم واللثة والصحة العامة. تعويض ثابت للأسنان المفقودة. فروع كفورنجم والإبراهيمية والزقازيق.',
+        en: 'Dental implants at Florida Dental Clinics, planned after careful assessment of bone, gums and general health. Fixed replacement for missing teeth in Kafr Negm, Ibrahimia and Zagazig.',
       },
     },
   },
@@ -280,8 +280,8 @@ export const services: Service[] = [
     seo: {
       title: { ar: 'جراحة الفم وخلع ضرس العقل | عيادات فلوريدا لطب وتقويم الأسنان', en: 'Oral Surgery & Wisdom Tooth Removal | Florida Dental Clinics' },
       description: {
-        ar: 'الخلع العادي والجراحي وخلع ضرس العقل في عيادات فلوريدا، مع التزام بالتعقيم وشرح واضح للإجراء. فروع الإبراهيمية والزقازيق وكفورنجم.',
-        en: 'Routine and surgical extractions and wisdom tooth removal at Florida Dental Clinics, with strict sterilisation and clear explanations. Ibrahimia, Zagazig and Kafr Negm.',
+        ar: 'الخلع العادي والجراحي وخلع ضرس العقل في عيادات فلوريدا، مع التزام بالتعقيم وشرح واضح للإجراء. فروع كفورنجم والإبراهيمية والزقازيق.',
+        en: 'Routine and surgical extractions and wisdom tooth removal at Florida Dental Clinics, with strict sterilisation and clear explanations. Kafr Negm, Ibrahimia and Zagazig.',
       },
     },
   },
@@ -343,7 +343,7 @@ export const services: Service[] = [
       ],
     },
     seo: {
-      title: { ar: 'طب أسنان الأطفال | عيادات فلوريدا - الإبراهيمية والزقازيق وكفورنجم', en: "Pediatric Dentist for Children | Florida Dental Clinics" },
+      title: { ar: 'طب أسنان الأطفال | عيادات فلوريدا - كفورنجم والإبراهيمية والزقازيق', en: "Pediatric Dentist for Children | Florida Dental Clinics" },
       description: {
         ar: 'رعاية أسنان الأطفال في عيادات فلوريدا بأسلوب هادئ: فحص دوري، فلورايد، سد الشقوق وعلاج الأسنان اللبنية. اطلب موعدًا لطفلك في أقرب فرع.',
         en: "Gentle children's dentistry at Florida Dental Clinics: check-ups, fluoride, sealants and baby tooth treatment. Request an appointment for your child at your nearest branch.",
@@ -410,8 +410,8 @@ export const services: Service[] = [
     seo: {
       title: { ar: 'كشف وعلاج الأسنان، حشو وعلاج عصب | عيادات فلوريدا', en: 'General Dentistry, Fillings & Root Canal | Florida Dental Clinics' },
       description: {
-        ar: 'طب الأسنان العام في عيادات فلوريدا: كشف دوري، حشوات تجميلية، علاج عصب، تنظيف جير وتركيبات. فروع الإبراهيمية والزقازيق وكفورنجم.',
-        en: 'General dentistry at Florida Dental Clinics: check-ups, tooth-coloured fillings, root canal treatment, scaling and crowns. Branches in Ibrahimia, Zagazig and Kafr Negm.',
+        ar: 'طب الأسنان العام في عيادات فلوريدا: كشف دوري، حشوات تجميلية، علاج عصب، تنظيف جير وتركيبات. فروع كفورنجم والإبراهيمية والزقازيق.',
+        en: 'General dentistry at Florida Dental Clinics: check-ups, tooth-coloured fillings, root canal treatment, scaling and crowns. Branches in Kafr Negm, Ibrahimia and Zagazig.',
       },
     },
   },

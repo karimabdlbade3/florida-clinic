@@ -316,6 +316,75 @@ const browser = await chromium.launch();
     const org = (await ld()).find((x) => x['@type'] === 'Organization');
     ok(`${lang} contact: organization sameAs has all social links`, socials.every((u) => org?.sameAs?.includes(u)));
   }
+  // Branch history: chronological order and opening years, in both languages
+  {
+    const ORDER = ['kafr-negm', 'ibrahimia', 'zagazig'];
+    const YEARS = { 'kafr-negm': 2020, ibrahimia: 2022, zagazig: 2024 };
+    const slugsIn = (sel) => page.evaluate((q) => [...document.querySelectorAll(q)].map((a) => (a.getAttribute('href') || a.value || '').match(/(kafr-negm|ibrahimia|zagazig)/)?.[1]).filter(Boolean), sel);
+    const same = (a) => JSON.stringify(a) === JSON.stringify(ORDER);
+    for (const lang of ['ar', 'en']) {
+      const pre = lang === 'ar' ? '' : '/en';
+      const est = (y) => (lang === 'ar' ? `تأسس عام ${y}` : `Established ${y}`);
+      await page.goto(base + pre + '/');
+      ok(`${lang} home: branch cards in opening order`, same(await slugsIn('.branch-card a.stretched')));
+      ok(`${lang} home: footer branches in opening order`, same(await slugsIn('.site-footer a[href*="/branches/"]')));
+      const cards = await page.$$eval('.branch-card', (els) => els.map((e) => e.textContent));
+      ORDER.forEach((slug, i) => ok(`${lang} home: ${slug} card shows opening year`, cards[i]?.includes(est(YEARS[slug])), cards[i]?.slice(0, 80)));
+      ok(`${lang} home: first-branch label only on Kafr Negm`, cards[0].includes(lang === 'ar' ? 'أول فروعنا' : 'Our first branch') && !cards[1].includes(lang === 'ar' ? 'أول فروعنا' : 'Our first branch'));
+      await page.goto(base + pre + '/branches/');
+      ok(`${lang} branches page: opening order`, same(await slugsIn('.branch-card a.stretched')));
+      await page.goto(base + pre + '/contact/');
+      ok(`${lang} contact: branch list in opening order`, same(await slugsIn('.contact__branches h3 a')));
+      ok(`${lang} contact: form branch options in opening order`, same(await page.$$eval('#bk-branch option', (o) => o.map((x) => x.value).filter(Boolean))));
+      ok(`${lang} contact: call buttons in opening order`, JSON.stringify(await page.$$eval('.channels a[href^="tel:"]', (a) => a.map((x) => x.getAttribute('href')))) === JSON.stringify(ORDER.map((sl) => 'tel:+2' + official[sl].phone)));
+      await page.goto(base + pre + '/about/');
+      const about = await page.textContent('main');
+      ok(`${lang} about: story starts in Kafr Negm 2020, timeline 2020/2022/2024`, about.includes(lang === 'ar' ? 'عام 2020 في كفورنجم' : 'in 2020 in Kafr Negm') && JSON.stringify(await page.$$eval('.timeline__year', (e) => e.map((x) => x.textContent.trim()))) === '["2020","2022","2024"]');
+      ok(`${lang} about: no claim that Florida began in Ibrahimia`, !/2020 في الإبراهيمية|2020,? in Ibrahimia/.test(about));
+      for (const slug of ORDER) {
+        await page.goto(`${base}${pre}/branches/${slug}/`);
+        ok(`${lang} ${slug}: opening year on branch page`, (await page.textContent('.page-hero')).includes(est(YEARS[slug])));
+        const dentist = (await ld()).find((x) => x['@type'] === 'Dentist');
+        ok(`${lang} ${slug}: schema foundingDate`, dentist?.foundingDate === String(YEARS[slug]), dentist?.foundingDate);
+      }
+    }
+  }
+  // Click-to-call: every displayed branch number, on every page, is a tel: link to that same number
+  {
+    const phones = Object.values(official).map((o) => o.phone);
+    const mob = await browser.newContext(devices['iPhone 13']);
+    const mp = await mob.newPage();
+    let shown = 0;
+    for (const path of pagesOf(dir)) {
+      await mp.goto(base + path, { waitUntil: 'domcontentloaded' });
+      const r = await mp.evaluate((nums) => {
+        const out = { shown: 0, bad: [] };
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          if (n.parentElement.closest('script,style')) continue;
+          for (const num of nums) if (n.textContent.includes(num)) {
+            out.shown++;
+            const a = n.parentElement.closest('a');
+            if (!a || a.getAttribute('href') !== 'tel:+2' + num) out.bad.push(num + ' -> ' + (a ? a.getAttribute('href') : 'not a link'));
+          }
+        }
+        // every tel link must be reachable by a tap (not covered by another element) and never point to WhatsApp
+        for (const a of document.querySelectorAll('a[href^="tel:"]')) {
+          if (!/^tel:\+201[0125]\d{8}$/.test(a.getAttribute('href'))) out.bad.push('bad href ' + a.getAttribute('href'));
+          if (a.target === '_blank') out.bad.push('tel link opens new tab');
+          a.scrollIntoView({ block: 'center', behavior: 'instant' });
+          const b = a.getBoundingClientRect();
+          const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+          if (b.width > 0 && !(hit && (hit === a || a.contains(hit)))) out.bad.push('covered: ' + a.textContent.trim() + ' by ' + (hit ? hit.tagName + '.' + hit.className : 'nothing'));
+        }
+        return out;
+      }, phones);
+      shown += r.shown;
+      ok(`${path} every displayed phone number is a tappable tel: link`, r.bad.length === 0, JSON.stringify(r.bad));
+    }
+    ok('phone numbers are displayed across the site', shown >= 30 * 3, String(shown));
+    await mob.close();
+  }
   // No unfinished placeholders anywhere in the production build, no layout overflow
   for (const path of pagesOf(dir)) {
     await page.goto(base + path, { waitUntil: 'domcontentloaded' });

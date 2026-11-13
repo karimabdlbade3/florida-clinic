@@ -58,7 +58,7 @@ const html = `<style>@font-face{font-family:P;src:url(${plex})}*{margin:0;box-si
   <div style="direction:rtl;text-align:right;position:relative;max-width:520px">
     <div style="font-size:46px;line-height:1.45;color:#1d1a15">عيادات فلوريدا<br>لطب وتقويم الأسنان</div>
     <div style="margin-top:14px;font-size:34px;color:#7f5f2b">جنبك في كل مكان</div>
-    <div style="margin-top:26px;font-size:25px;color:#6b6356">الإبراهيمية · الزقازيق · كفورنجم</div>
+    <div style="margin-top:26px;font-size:25px;color:#6b6356">كفورنجم · الإبراهيمية · الزقازيق</div>
   </div>
   <div style="position:absolute;left:0;right:0;bottom:0;height:12px;background:#c59841"></div>
 </div>`;

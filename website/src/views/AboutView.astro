@@ -30,7 +30,7 @@ const schema = [{
     <div class="container story">
       <div class="reveal">
         <p class="eyebrow">{a.storyTitle}</p>
-        <h2>{lang === 'ar' ? 'بدأنا عام 2020 في الإبراهيمية' : 'It began in 2020, in Ibrahimia'}</h2>
+        <h2>{lang === 'ar' ? 'بدأنا عام 2020 في كفورنجم' : 'It began in 2020, in Kafr Negm'}</h2>
         {a.story.map((p) => <p class="lead">{p}</p>)}
       </div>
       <div class="reveal" data-delay="1">
@@ -52,7 +52,7 @@ const schema = [{
       </ol>
       <ul class="timeline__branches reveal">
         {branches.map((b) => (
-          <li><a href={localize(routes.branch(b.slug), lang)}><Icon name="pin" />{b.name[lang]}{b.isMain && <span class="tag">{d.branches.main}</span>}</a></li>
+          <li><a href={localize(routes.branch(b.slug), lang)}><Icon name="pin" />{b.name[lang]} <span class="muted">{b.opened}</span>{b.isMain && <span class="tag">{d.branches.main}</span>}</a></li>
         ))}
       </ul>
     </div>
