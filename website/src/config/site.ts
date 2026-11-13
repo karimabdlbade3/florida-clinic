@@ -38,6 +38,8 @@ export const site = {
     shortEn: 'Complete care since 2020', // hero image badge (avoids repeating the tagline twice in the hero)
   },
   foundedYear: 2020,
+  /** Name shown in the footer copyright line (set by the owner). */
+  copyrightHolder: 'Karim AbdeLbadea',
 
   /** Official working hours, identical for all branches. */
   hours: {

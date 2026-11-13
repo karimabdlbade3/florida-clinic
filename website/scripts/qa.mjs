@@ -273,6 +273,7 @@ const browser = await chromium.launch();
     ok(`${lang} home: hero WhatsApp CTA = official booking link`, (await page.getAttribute('.hero__cta a[href*="wa.me"]', 'href'))?.startsWith(WA));
     ok(`${lang} home: tagline in hero`, (await page.textContent('.hero__tagline'))?.trim() === (lang === 'ar' ? 'عيادات فلوريدا لطب وتقويم الأسنان جنبك في كل مكان' : 'Better Call Florida'));
     ok(`${lang} home: working hours shown`, body.includes(hoursText));
+    ok(`${lang} home: footer copyright holder`, (await page.textContent('.site-footer__bottom')).replace(/\s+/g, ' ').includes(`© ${new Date().getFullYear()} Karim AbdeLbadea.`));
     ok(`${lang} home: all 5 social links in footer`, socials.every((u) => links.includes(u)), JSON.stringify(socials.filter((u) => !links.includes(u))));
     ok(`${lang} home: social links open safely in new tab`, await page.evaluate(() => [...document.querySelectorAll('a[href*="facebook.com"],a[href*="instagram.com"],a[href*="tiktok.com"]')].every((a) => a.target === '_blank' && a.rel.includes('noopener'))));
     ok(`${lang} home: additional Facebook link labelled as instructed`, await page.evaluate((l) => [...document.querySelectorAll('.site-footer a[href*="1A7BnaVqwj"]')].some((a) => a.textContent.trim() === l), lang === 'ar' ? 'صفحتنا على فيسبوك – رابط إضافي' : 'Our Facebook page – additional link'));
