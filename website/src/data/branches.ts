@@ -83,8 +83,8 @@ export const branches: Branch[] = [
   {
     slug: 'kafr-negm',
     isMain: false,
-    name: { ar: 'فرع كفر نجم', en: 'Kafr Negm Branch' },
-    locality: { ar: 'كفر نجم', en: 'Kafr Negm' },
+    name: { ar: 'فرع كفورنجم', en: 'Kafr Negm Branch' },
+    locality: { ar: 'كفورنجم', en: 'Kafr Negm' },
     region: { ar: 'الشرقية', en: 'Sharqia' },
     address: null,
     landmark: null,
@@ -94,13 +94,13 @@ export const branches: Branch[] = [
     mapEmbedUrl: null,
     mapLink: null,
     intro: {
-      ar: 'فرع كفر نجم يوفر لأهالي كفر نجم والمناطق المجاورة رعاية أسنان متكاملة قريبة منهم، دون الحاجة إلى السفر لمسافات طويلة.',
+      ar: 'فرع كفورنجم يوفر لأهالي كفورنجم والمناطق المجاورة رعاية أسنان متكاملة قريبة منهم، دون الحاجة إلى السفر لمسافات طويلة.',
       en: 'Our Kafr Negm branch brings complete dental care close to home for Kafr Negm and nearby villages, so there is no need to travel far.',
     },
     seo: {
-      title: { ar: 'عيادة أسنان في كفر نجم | عيادات فلوريدا لطب الأسنان', en: 'Dental Clinic in Kafr Negm | Florida Dental Clinics' },
+      title: { ar: 'عيادة أسنان في كفورنجم | عيادات فلوريدا لطب الأسنان', en: 'Dental Clinic in Kafr Negm | Florida Dental Clinics' },
       description: {
-        ar: 'فرع كفر نجم من عيادات فلوريدا لطب الأسنان: رعاية أسنان متكاملة للكبار والأطفال بالقرب منك. اطلب موعدك أو تواصل معنا عبر واتساب.',
+        ar: 'فرع كفورنجم من عيادات فلوريدا لطب الأسنان: رعاية أسنان متكاملة للكبار والأطفال بالقرب منك. اطلب موعدك أو تواصل معنا عبر واتساب.',
         en: 'Florida Dental Clinics in Kafr Negm: complete dental care for adults and children close to home. Request an appointment or contact us on WhatsApp.',
       },
     },

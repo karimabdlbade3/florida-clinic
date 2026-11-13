@@ -24,7 +24,7 @@ const og = `${base}<div style="width:1200px;height:630px;background:#faf7f2;posi
     <div style="margin-top:36px;font-family:C;font-size:104px;letter-spacing:.2em;color:#1d1a15;line-height:1">FLORIDA</div>
     <div style="margin-top:14px;font-family:C;font-size:34px;letter-spacing:.32em;color:#7f5f2b">DENTAL CLINICS</div>
     <div style="margin-top:44px;font-size:40px;color:#1d1a15;direction:rtl;text-align:left">عيادات فلوريدا لطب الأسنان</div>
-    <div style="margin-top:14px;font-size:26px;color:#6b6356;direction:rtl;text-align:left">الإبراهيمية · الزقازيق · كفر نجم</div>
+    <div style="margin-top:14px;font-size:26px;color:#6b6356;direction:rtl;text-align:left">الإبراهيمية · الزقازيق · كفورنجم</div>
   </div>
   <div style="position:absolute;left:0;right:0;bottom:0;height:14px;background:linear-gradient(90deg,#b8955a,#e2cc9f,#b8955a)"></div>
 </div>`;
