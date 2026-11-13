@@ -1,0 +1,21 @@
+---
+import type { Lang } from '../data/branches';
+import type { Service } from '../data/services';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import Icon from './Icon.astro';
+interface Props { lang: Lang; service: Service; delay?: number }
+const { lang, service, delay = 0 } = Astro.props;
+const d = t(lang);
+---
+<article class="card card--link service-card reveal" data-delay={String(delay % 4)}>
+  <span class="icon-badge"><Icon name={service.icon} /></span>
+  <h3><a class="stretched" href={localize(routes.service(service.slug), lang)} style="text-decoration:none">{service.name[lang]}</a></h3>
+  <p>{service.short[lang]}</p>
+  <span class="link-arrow" aria-hidden="true">{d.cta.learnMore} <Icon name="arrow" class="flip" /></span>
+</article>
+
+<style>
+  .service-card { display: flex; flex-direction: column; }
+  .service-card p { flex: 1; }
+</style>

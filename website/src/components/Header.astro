@@ -1,0 +1,98 @@
+---
+import type { Lang } from '../data/branches';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+
+interface Props { lang: Lang; path: string }
+const { lang, path } = Astro.props;
+const d = t(lang);
+const other: Lang = lang === 'ar' ? 'en' : 'ar';
+
+const items = [
+  { href: routes.home, label: d.nav.home },
+  { href: routes.about, label: d.nav.about },
+  { href: routes.services, label: d.nav.services },
+  { href: routes.branches, label: d.nav.branches },
+  { href: routes.contact, label: d.nav.contact },
+];
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="site-header" data-header>
+  <div class="container site-header__inner">
+    <a href={localize('/', lang)} class="site-header__brand">
+      <Logo lang={lang} />
+    </a>
+
+    <nav class="site-nav" id="site-nav" aria-label={lang === 'ar' ? 'القائمة الرئيسية' : 'Main navigation'} data-nav>
+      <ul>
+        {items.map((i) => (
+          <li><a href={localize(i.href, lang)} aria-current={isActive(i.href) ? 'page' : undefined}>{i.label}</a></li>
+        ))}
+      </ul>
+      <div class="site-nav__mobile-cta">
+        <a class="btn btn--block" href={localize(routes.contact, lang) + '#booking'} data-track="book_click">{d.cta.book}</a>
+      </div>
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="lang-switch" href={localize(path, other)} hreflang={other} lang={other} title={d.switchLangLabel}><span class="lang-switch__full">{d.switchLang}</span><span class="lang-switch__short" aria-hidden="true">{lang === 'ar' ? 'EN' : 'ع'}</span></a>
+      <a class="btn btn--sm site-header__cta" href={localize(routes.contact, lang) + '#booking'} data-track="book_click">
+        <Icon name="calendar" />
+        <span>{d.cta.book}</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-toggle data-label-open={d.menu} data-label-close={d.closeMenu}>
+        <span class="sr-only" data-nav-toggle-label>{d.menu}</span>
+        <Icon name="menu" class="nav-toggle__open" />
+        <Icon name="close" class="nav-toggle__close" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, .92); backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid transparent; transition: border-color .3s, box-shadow .3s; }
+  .site-header.is-scrolled { border-color: var(--line); box-shadow: 0 6px 24px -18px rgba(29,26,21,.35); }
+  .site-header__inner { display: flex; align-items: center; gap: 20px; min-height: 76px; }
+  .site-header__brand { text-decoration: none; flex: none; }
+  .site-nav { margin-inline-start: auto; }
+  .site-nav ul { list-style: none; display: flex; gap: 4px; }
+  .site-nav a { display: block; padding: 10px 14px; border-radius: 999px; text-decoration: none; font-size: .98rem; color: var(--ink-2); transition: color .2s, background .2s; }
+  .site-nav a:hover { color: var(--ink); background: var(--ivory); }
+  .site-nav a[aria-current='page'] { color: var(--ink); background: var(--gold-200); }
+  .site-nav__mobile-cta { display: none; }
+  .site-nav .site-nav__mobile-cta .btn { padding: 12px 26px; color: var(--ink); background: var(--gold-500); justify-content: center; border-radius: 999px; font-weight: 500; }
+  .site-header__actions { display: flex; align-items: center; gap: 10px; }
+  .lang-switch { padding: 8px 12px; border-radius: 999px; font-size: .95rem; text-decoration: none; color: var(--ink-2); border: 1px solid var(--line); }
+  .lang-switch:hover { border-color: var(--gold-400); color: var(--ink); }
+  .nav-toggle { display: none; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--white); color: var(--ink); cursor: pointer; place-items: center; }
+  .nav-toggle :global(svg) { width: 22px; height: 22px; }
+  .nav-toggle :global(.nav-toggle__close) { display: none; }
+  .nav-toggle[aria-expanded='true'] :global(.nav-toggle__open) { display: none; }
+  .nav-toggle[aria-expanded='true'] :global(.nav-toggle__close) { display: block; }
+
+  @media (max-width: 1080px) {
+    .site-header__cta span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    .site-header__cta { width: 46px; padding: 0; }
+  }
+  @media (max-width: 920px) {
+    .nav-toggle { display: grid; }
+    .site-header__inner { min-height: 68px; }
+    .site-header__actions { margin-inline-start: auto; }
+    .site-nav { position: fixed; inset: 68px 0 auto 0; margin: 0; padding: 16px var(--gutter) 24px; background: var(--white); border-bottom: 1px solid var(--line); box-shadow: 0 24px 40px -30px rgba(29,26,21,.4); transform: translateY(-8px); opacity: 0; visibility: hidden; transition: opacity .25s, transform .25s, visibility .25s; max-height: calc(100dvh - 68px); overflow-y: auto; }
+    .site-nav.is-open { transform: none; opacity: 1; visibility: visible; }
+    .site-nav ul { flex-direction: column; gap: 2px; }
+    .site-nav a { padding: 14px 12px; font-size: 1.08rem; border-radius: 12px; }
+    .site-nav__mobile-cta { display: block; margin-top: 16px; }
+  }
+  @media (max-width: 520px) {
+    .site-header__inner { gap: 8px; }
+    .site-header__actions { gap: 6px; }
+    .lang-switch { padding: 0; width: 42px; height: 42px; display: grid; place-items: center; font-size: .9rem; }
+    .lang-switch__full { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    .site-header__cta, .nav-toggle { width: 42px; height: 42px; min-height: 42px; }
+  }
+  .lang-switch__short { display: none; }
+  @media (max-width: 520px) { .lang-switch__short { display: inline; } }
+</style>

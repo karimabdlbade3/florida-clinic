@@ -1,0 +1,30 @@
+---
+import type { Branch, Lang } from '../data/branches';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import Icon from './Icon.astro';
+interface Props { lang: Lang; branch: Branch; delay?: number }
+const { lang, branch: b, delay = 0 } = Astro.props;
+const d = t(lang);
+---
+<article class="card card--link branch-card reveal" data-delay={String(delay)}>
+  <div class="branch-card__top">
+    <span class="icon-badge"><Icon name="pin" /></span>
+    {b.isMain && <span class="tag">{d.branches.main}</span>}
+  </div>
+  <h3><a class="stretched" href={localize(routes.branch(b.slug), lang)} style="text-decoration:none">{b.name[lang]}</a></h3>
+  <p class="branch-card__loc">{b.locality[lang]}{lang === 'ar' ? '، ' : ', '}{b.region[lang]}</p>
+  <ul class="branch-card__meta">
+    <li><Icon name="pin" />{b.address ? b.address[lang] : <span class="ph">{d.placeholder.address}</span>}</li>
+    <li><Icon name="clock" />{b.hours ? b.hours[lang][0] : <span class="ph">{d.placeholder.hours}</span>}</li>
+  </ul>
+  <span class="link-arrow" aria-hidden="true">{d.cta.viewBranch} <Icon name="arrow" class="flip" /></span>
+</article>
+
+<style>
+  .branch-card__top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .branch-card__loc { margin-bottom: 18px; }
+  .branch-card__meta { list-style: none; display: grid; gap: 10px; margin-bottom: 24px; font-size: .95rem; color: var(--ink-2); }
+  .branch-card__meta li { display: flex; gap: 10px; align-items: flex-start; }
+  .branch-card__meta :global(svg) { width: 18px; height: 18px; margin-top: .35em; color: var(--gold-600); flex: none; }
+</style>

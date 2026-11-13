@@ -1,0 +1,36 @@
+---
+import type { Lang } from '../data/branches';
+import { services } from '../data/services';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const schema = [{
+  '@type': 'ItemList',
+  name: d.services.title,
+  itemListElement: services.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: s.name[lang],
+    url: new URL(localize(routes.service(s.slug), lang), Astro.site).href,
+  })),
+}];
+---
+<BaseLayout lang={lang} title={d.seo.servicesTitle} description={d.seo.servicesDesc} schema={schema}>
+  <PageHero lang={lang} title={d.services.title} lead={d.services.lead} crumbs={[{ label: d.services.title }]} />
+  <section class="section">
+    <div class="container">
+      <div class="grid grid--3">
+        {services.map((s, i) => <ServiceCard lang={lang} service={s} delay={i % 3} />)}
+      </div>
+      <p class="muted" style="margin-top:40px;font-size:.92rem">{d.services.note}</p>
+    </div>
+  </section>
+  <CtaBand lang={lang} title={d.services.ctaTitle} text={d.services.ctaText} />
+</BaseLayout>

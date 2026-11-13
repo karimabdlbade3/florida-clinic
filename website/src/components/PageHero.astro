@@ -1,0 +1,25 @@
+---
+import type { Lang } from '../data/branches';
+import { t } from '../i18n/ui';
+import { localize } from '../lib/urls';
+interface Crumb { label: string; href?: string }
+interface Props { lang: Lang; title: string; lead?: string; eyebrow?: string; crumbs?: Crumb[] }
+const { lang, title, lead, eyebrow, crumbs = [] } = Astro.props;
+const d = t(lang);
+const all: Crumb[] = [{ label: d.breadcrumbHome, href: '/' }, ...crumbs];
+---
+<section class="page-hero">
+  <div class="container">
+    <nav class="breadcrumbs" aria-label={lang === 'ar' ? 'مسار التنقل' : 'Breadcrumb'}>
+      <ol>
+        {all.map((c, i) => (
+          <li>{c.href && i < all.length - 1 ? <a href={localize(c.href, lang)}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>
+        ))}
+      </ol>
+    </nav>
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+</section>

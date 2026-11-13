@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { t } from '../i18n/ui';
+const ar = t('ar').notFound;
+const en = t('en').notFound;
+---
+<BaseLayout lang="ar" title={`${ar.title} | عيادات فلوريدا لطب الأسنان`} description={ar.text} noindex alternates={false}>
+  <section class="section">
+    <div class="container" style="text-align:center;max-width:640px">
+      <p class="eyebrow" style="justify-content:center">404</p>
+      <h1>{ar.title}</h1>
+      <p class="lead" style="margin-inline:auto">{ar.text}</p>
+      <div class="btn-row" style="justify-content:center;margin-top:24px">
+        <a class="btn" href="/">{ar.back}</a>
+        <a class="btn btn--outline" href="/en/" lang="en" dir="ltr">{en.back}</a>
+      </div>
+      <p lang="en" dir="ltr" class="muted" style="margin-top:32px">{en.title}. {en.text}</p>
+    </div>
+  </section>
+</BaseLayout>

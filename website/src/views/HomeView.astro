@@ -1,0 +1,186 @@
+---
+import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { services } from '../data/services';
+import { t } from '../i18n/ui';
+import { localize, routes, whatsappLink } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PhotoSlot from '../components/PhotoSlot.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import BranchCard from '../components/BranchCard.astro';
+import Testimonials from '../components/Testimonials.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const h = d.home;
+const wa = whatsappLink(d.whatsappDefault);
+const valueIcons = ['heart', 'shield', 'users', 'chat', 'star'];
+
+const schema = [{
+  '@type': 'WebSite',
+  name: lang === 'ar' ? 'عيادات فلوريدا لطب الأسنان' : 'Florida Dental Clinics',
+  url: new URL(localize('/', lang), Astro.site).href,
+  inLanguage: lang === 'ar' ? 'ar-EG' : 'en',
+}];
+---
+<BaseLayout lang={lang} title={d.seo.homeTitle} description={d.seo.homeDesc} schema={schema}>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow">{h.eyebrow}</p>
+        <h1>{h.title}</h1>
+        <p class="lead">{h.lead}</p>
+        <div class="btn-row hero__cta">
+          <a class="btn" href={localize(routes.contact, lang) + '#booking'} data-track="book_click"><Icon name="calendar" />{d.cta.book}</a>
+          {wa
+            ? <a class="btn btn--outline" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.whatsapp}</a>
+            : <a class="btn btn--outline" href={localize(routes.services, lang)}>{d.cta.allServices}</a>}
+        </div>
+        <dl class="hero__facts">
+          {h.facts.map((f) => (
+            <div><dt>{f.label}</dt><dd>{f.value}</dd></div>
+          ))}
+        </dl>
+      </div>
+      <div class="hero__visual">
+        <PhotoSlot alt={d.placeholder.photo} shape="arch" ratio="4 / 5" motif="smile" loading="eager" />
+        <div class="hero__badge" aria-hidden="true">
+          <span class="hero__badge-icon"><Icon name="shield" /></span>
+          <span>{lang === 'ar' ? 'رعاية متكاملة منذ 2020' : 'Complete care since 2020'}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About intro -->
+  <section class="section">
+    <div class="container about-intro">
+      <div class="reveal">
+        <PhotoSlot alt={d.placeholder.photo} ratio="5 / 4" motif="chair" />
+      </div>
+      <div class="reveal" data-delay="1">
+        <p class="eyebrow">{h.aboutEyebrow}</p>
+        <h2>{h.aboutTitle}</h2>
+        <p class="lead">{h.aboutText}</p>
+        <a class="link-arrow" href={localize(routes.about, lang)}>{h.aboutLink} <Icon name="arrow" class="flip" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section section--ivory" aria-labelledby="services-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">{h.servicesEyebrow}</p>
+        <h2 id="services-title">{h.servicesTitle}</h2>
+        <p>{h.servicesLead}</p>
+      </div>
+      <div class="grid grid--3">
+        {services.map((s, i) => <ServiceCard lang={lang} service={s} delay={i % 3} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Florida -->
+  <section class="section" aria-labelledby="why-title">
+    <div class="container why">
+      <div class="why__head reveal">
+        <p class="eyebrow">{h.whyEyebrow}</p>
+        <h2 id="why-title">{h.whyTitle}</h2>
+        <a class="btn btn--outline" href={localize(routes.about, lang)}>{h.aboutLink}</a>
+      </div>
+      <ol class="why__list">
+        {d.values.map((v, i) => (
+          <li class="reveal" data-delay={String(i % 3)}>
+            <span class="why__num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="why__icon"><Icon name={valueIcons[i]} /></span>
+            <div><h3>{v.title}</h3><p>{v.text}</p></div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Branches -->
+  <section class="section section--sand" aria-labelledby="branches-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">{h.branchesEyebrow}</p>
+        <h2 id="branches-title">{h.branchesTitle}</h2>
+        <p>{h.branchesLead}</p>
+      </div>
+      <div class="grid grid--3">
+        {branches.map((b, i) => <BranchCard lang={lang} branch={b} delay={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Patient experience -->
+  <section class="section" aria-labelledby="exp-title">
+    <div class="container">
+      <div class="section-head section-head--center reveal">
+        <p class="eyebrow">{h.experienceEyebrow}</p>
+        <h2 id="exp-title">{h.experienceTitle}</h2>
+      </div>
+      <ol class="steps">
+        {h.experience.map((s, i) => (
+          <li class="reveal" data-delay={String(i)}>
+            <span class="steps__num">{i + 1}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <Testimonials lang={lang} />
+  <CtaBand lang={lang} />
+</BaseLayout>
+
+<style>
+  .hero { position: relative; padding-block: clamp(32px, 5vw, 72px) clamp(56px, 8vw, 104px); background: linear-gradient(180deg, var(--ivory), var(--white)); overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset-inline-start: -200px; top: 40%; width: 520px; height: 520px; border-radius: 50%; border: 1px solid var(--gold-200); pointer-events: none; }
+  .hero__grid { position: relative; display: grid; gap: clamp(40px, 6vw, 72px); align-items: center; }
+  @media (min-width: 960px) { .hero__grid { grid-template-columns: 1.1fr .9fr; } }
+  .hero h1 { max-width: 15ch; margin-bottom: .4em; }
+  :global(html[lang='en']) .hero h1 { max-width: 16ch; }
+  .hero__cta { margin-top: 32px; }
+  .hero__facts { display: flex; flex-wrap: wrap; gap: 16px 40px; margin: 44px 0 0; padding-top: 28px; border-top: 1px solid var(--line); }
+  .hero__facts div { display: flex; flex-direction: column-reverse; }
+  .hero__facts dd { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2.4rem; font-weight: 600; line-height: 1.1; color: var(--gold-700); }
+  .hero__facts dt { color: var(--ink-3); font-size: .95rem; }
+  .hero__visual { position: relative; max-width: 480px; width: 100%; margin-inline: auto; }
+  .hero__visual::before { content: ''; position: absolute; inset: -16px; border-radius: 999px 999px 36px 36px; border: 1px solid var(--gold-300); pointer-events: none; }
+  .hero__badge { position: absolute; inset-inline-start: -12px; bottom: 32px; display: flex; align-items: center; gap: 12px; padding: 12px 18px 12px 12px; background: var(--white); border-radius: 999px; box-shadow: var(--shadow); font-weight: 500; font-size: .95rem; }
+  [dir='rtl'] .hero__badge { padding: 12px 12px 12px 18px; }
+  .hero__badge-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--gold-200); color: var(--gold-700); }
+  .hero__badge-icon :global(svg) { width: 20px; height: 20px; }
+  @media (max-width: 520px) { .hero__badge { inset-inline-start: 8px; bottom: 18px; font-size: .88rem; } }
+
+  .about-intro { display: grid; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  @media (min-width: 900px) { .about-intro { grid-template-columns: 1fr 1fr; } }
+
+  .why { display: grid; gap: 40px; }
+  @media (min-width: 960px) { .why { grid-template-columns: .8fr 1.2fr; gap: 72px; } .why__head { position: sticky; top: 110px; align-self: start; } }
+  .why__head h2 { margin-bottom: 28px; }
+  .why__list { list-style: none; display: grid; }
+  .why__list li { display: grid; grid-template-columns: auto auto 1fr; gap: 18px; align-items: start; padding-block: 26px; border-top: 1px solid var(--line); }
+  .why__list li:last-child { border-bottom: 1px solid var(--line); }
+  .why__num { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; color: var(--gold-600); padding-top: .2em; min-width: 2ch; }
+  .why__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ivory); color: var(--gold-600); border: 1px solid var(--gold-200); }
+  .why__icon :global(svg) { width: 22px; height: 22px; }
+  .why__list h3 { margin-bottom: .2em; }
+  .why__list p { margin: 0; color: var(--ink-2); }
+
+  .steps { list-style: none; display: grid; gap: 20px; counter-reset: s; }
+  @media (min-width: 720px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1080px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  .steps li { position: relative; padding: 28px; border-radius: var(--radius-lg); background: var(--ivory); border: 1px solid var(--line); }
+  .steps__num { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 18px; border-radius: 50%; background: var(--ink); color: var(--gold-300); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; font-weight: 600; }
+  .steps p { margin: 0; color: var(--ink-2); }
+</style>

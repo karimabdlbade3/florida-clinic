@@ -1,0 +1,75 @@
+---
+import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { services } from '../data/services';
+import { site } from '../config/site';
+import { t } from '../i18n/ui';
+import { localize, routes, whatsappLink, telLink } from '../lib/urls';
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const wa = whatsappLink(d.whatsappDefault);
+const tel = telLink(site.contact.phone);
+const year = new Date().getFullYear();
+const socials = [
+  { key: 'facebook', label: 'Facebook', url: site.social.facebook },
+  { key: 'instagram', label: 'Instagram', url: site.social.instagram },
+  { key: 'tiktok', label: 'TikTok', url: site.social.tiktok },
+].filter((s) => s.url);
+---
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div class="site-footer__brand">
+      <Logo lang={lang} tone="light" />
+      <p>{d.footer.tagline}</p>
+      <div class="btn-row">
+        {wa && <a class="btn btn--sm btn--wa" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.whatsapp}</a>}
+        {tel && <a class="btn btn--sm btn--light" href={tel} data-track="call_click"><Icon name="phone" />{d.cta.call}</a>}
+        {!wa && !tel && <a class="btn btn--sm" href={localize(routes.contact, lang) + '#booking'}>{d.cta.book}</a>}
+      </div>
+      {socials.length > 0 && (
+        <ul class="site-footer__social">
+          {socials.map((s) => <li><a href={s.url!} target="_blank" rel="noopener">{s.label}</a></li>)}
+        </ul>
+      )}
+    </div>
+    <nav aria-label={d.footer.services}>
+      <h2 class="site-footer__title">{d.footer.services}</h2>
+      <ul>{services.map((s) => <li><a href={localize(routes.service(s.slug), lang)}>{s.name[lang]}</a></li>)}</ul>
+    </nav>
+    <nav aria-label={d.footer.branches}>
+      <h2 class="site-footer__title">{d.footer.branches}</h2>
+      <ul>{branches.map((b) => <li><a href={localize(routes.branch(b.slug), lang)}>{b.name[lang]}</a></li>)}</ul>
+    </nav>
+    <nav aria-label={d.footer.explore}>
+      <h2 class="site-footer__title">{d.footer.explore}</h2>
+      <ul>
+        <li><a href={localize(routes.about, lang)}>{d.nav.about}</a></li>
+        <li><a href={localize(routes.contact, lang)}>{d.nav.contact}</a></li>
+        <li><a href={localize(routes.privacy, lang)}>{d.footer.privacy}</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© {year} {site.brand[lang]}. {d.footer.rights}.</p>
+    <p>{d.footer.medical}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--ink); color: #cfc6b6; padding-block: clamp(56px, 7vw, 88px) 28px; }
+  .site-footer__grid { display: grid; gap: 40px; }
+  @media (min-width: 720px) { .site-footer__grid { grid-template-columns: 1.6fr 1fr 1fr 1fr; } }
+  .site-footer__brand p { margin: 20px 0 24px; max-width: 34ch; }
+  .site-footer__title { font-family: var(--font-sans); font-size: .82rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-300); margin-bottom: 16px; }
+  :global(html[lang='ar']) .site-footer__title { letter-spacing: 0; font-size: .95rem; }
+  .site-footer ul { list-style: none; display: grid; gap: 8px; }
+  .site-footer a:not(.btn) { color: #e9e2d4; text-decoration: none; }
+  .site-footer a:not(.btn):hover { color: var(--gold-300); }
+  .site-footer__social { display: flex !important; gap: 16px !important; margin-top: 20px; }
+  .site-footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; margin-top: 56px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.1); font-size: .88rem; color: #a59c8c; }
+  .site-footer__bottom p { margin: 0; }
+</style>

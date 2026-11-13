@@ -1,0 +1,51 @@
+---
+/** Shows real testimonials only. Empty data = honest empty state, never fake quotes. */
+import type { Lang } from '../data/branches';
+import { testimonials } from '../data/testimonials';
+import { site } from '../config/site';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const list = testimonials.filter((x) => x.lang === lang).slice(0, 6);
+const reviewHref = site.social.googleReviews ?? localize(routes.contact, lang);
+const external = Boolean(site.social.googleReviews);
+---
+<section class="section section--ivory" aria-labelledby="testimonials-title">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <p class="eyebrow">{d.home.testimonialsEyebrow}</p>
+      <h2 id="testimonials-title">{d.home.testimonialsTitle}</h2>
+    </div>
+    {list.length > 0 ? (
+      <div class="grid grid--3">
+        {list.map((x, i) => (
+          <figure class="card quote reveal" data-delay={String(i % 3)}>
+            {x.rating && <p class="quote__stars" aria-label={`${x.rating}/5`}>{'★'.repeat(x.rating)}</p>}
+            <blockquote><p>{x.quote}</p></blockquote>
+            <figcaption>{x.author}</figcaption>
+          </figure>
+        ))}
+      </div>
+    ) : (
+      <div class="quote-empty reveal">
+        <span class="icon-badge"><Icon name="chat" /></span>
+        <p>{d.home.testimonialsEmpty}</p>
+        <a class="btn btn--outline" href={reviewHref} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
+          <Icon name="star" />{d.home.testimonialsReview}
+        </a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .quote blockquote { margin: 0 0 20px; font-size: 1.08rem; color: var(--ink); }
+  .quote figcaption { color: var(--gold-700); font-weight: 500; }
+  .quote__stars { color: var(--gold-500); letter-spacing: 2px; margin-bottom: 10px; }
+  .quote-empty { max-width: 620px; margin-inline: auto; text-align: center; padding: clamp(28px, 4vw, 44px); border: 1px dashed var(--gold-300); border-radius: var(--radius-lg); background: var(--white); }
+  .quote-empty .icon-badge { margin-inline: auto; }
+  .quote-empty p { color: var(--ink-2); }
+</style>

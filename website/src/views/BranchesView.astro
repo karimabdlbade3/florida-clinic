@@ -1,0 +1,24 @@
+---
+import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { t } from '../i18n/ui';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import BranchCard from '../components/BranchCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { branchSchema } from '../lib/schema';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const schema = branches.map((b) => branchSchema(b, lang, Astro.site!));
+---
+<BaseLayout lang={lang} title={d.seo.branchesTitle} description={d.seo.branchesDesc} schema={schema}>
+  <PageHero lang={lang} title={d.branches.title} lead={d.branches.lead} crumbs={[{ label: d.branches.title }]} />
+  <section class="section">
+    <div class="container grid grid--3">
+      {branches.map((b, i) => <BranchCard lang={lang} branch={b} delay={i} />)}
+    </div>
+  </section>
+  <CtaBand lang={lang} />
+</BaseLayout>

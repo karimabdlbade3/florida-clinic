@@ -1,0 +1,24 @@
+---
+/** Floating WhatsApp button. Renders nothing until a real number is configured. */
+import type { Lang } from '../data/branches';
+import { t } from '../i18n/ui';
+import { whatsappLink } from '../lib/urls';
+import Icon from './Icon.astro';
+interface Props { lang: Lang; message?: string }
+const { lang, message } = Astro.props;
+const d = t(lang);
+const href = whatsappLink(message ?? d.whatsappDefault);
+---
+{href && (
+  <a class="wa-float" href={href} target="_blank" rel="noopener" aria-label={d.whatsappFloat} data-track="whatsapp_click">
+    <Icon name="whatsapp" />
+    <span class="wa-float__label">{d.cta.whatsapp}</span>
+  </a>
+)}
+
+<style>
+  .wa-float { position: fixed; z-index: 40; inset-inline-end: 18px; bottom: 18px; display: inline-flex; align-items: center; gap: 10px; height: 58px; padding: 0 20px 0 18px; border-radius: 999px; background: #1f7a4d; color: #fff; text-decoration: none; font-weight: 500; box-shadow: 0 12px 30px -10px rgba(16, 70, 43, .55); transition: transform .25s var(--ease), background .25s; }
+  .wa-float:hover { background: #186640; color: #fff; transform: translateY(-2px); }
+  .wa-float :global(svg) { width: 26px; height: 26px; }
+  @media (max-width: 720px) { .wa-float { width: 58px; padding: 0; justify-content: center; bottom: calc(14px + env(safe-area-inset-bottom)); inset-inline-end: 14px; } .wa-float__label { display: none; } }
+</style>
