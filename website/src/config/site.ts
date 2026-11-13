@@ -30,12 +30,12 @@ export const site = {
     shortEn: 'Florida Dental',
     shortAr: 'فلوريدا',
   },
-  /** Official tagline (Arabic is the verified original; English is its translation). */
+  /** Official taglines: Arabic marketing tagline, and the English line exactly as in the official logo. */
   tagline: {
     ar: 'عيادات فلوريدا لطب وتقويم الأسنان جنبك في كل مكان',
-    en: 'Florida Dental Clinics, by your side wherever you are',
+    en: 'Better Call Florida',
     shortAr: 'جنبك في كل مكان',
-    shortEn: 'By your side, wherever you are',
+    shortEn: 'Complete care since 2020', // hero image badge (avoids repeating the tagline twice in the hero)
   },
   foundedYear: 2020,
 

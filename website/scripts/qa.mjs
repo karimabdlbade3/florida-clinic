@@ -271,7 +271,7 @@ const browser = await chromium.launch();
     let links = await hrefs();
     ok(`${lang} home: floating WhatsApp = official booking link`, (await page.getAttribute('.wa-float', 'href'))?.startsWith(WA + '?text='));
     ok(`${lang} home: hero WhatsApp CTA = official booking link`, (await page.getAttribute('.hero__cta a[href*="wa.me"]', 'href'))?.startsWith(WA));
-    ok(`${lang} home: tagline in hero`, (await page.textContent('.hero__tagline'))?.trim() === (lang === 'ar' ? 'عيادات فلوريدا لطب وتقويم الأسنان جنبك في كل مكان' : 'Florida Dental Clinics, by your side wherever you are'));
+    ok(`${lang} home: tagline in hero`, (await page.textContent('.hero__tagline'))?.trim() === (lang === 'ar' ? 'عيادات فلوريدا لطب وتقويم الأسنان جنبك في كل مكان' : 'Better Call Florida'));
     ok(`${lang} home: working hours shown`, body.includes(hoursText));
     ok(`${lang} home: all 5 social links in footer`, socials.every((u) => links.includes(u)), JSON.stringify(socials.filter((u) => !links.includes(u))));
     ok(`${lang} home: social links open safely in new tab`, await page.evaluate(() => [...document.querySelectorAll('a[href*="facebook.com"],a[href*="instagram.com"],a[href*="tiktok.com"]')].every((a) => a.target === '_blank' && a.rel.includes('noopener'))));
