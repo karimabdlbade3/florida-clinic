@@ -11,7 +11,7 @@ interface Config {
   mode: Mode;
   endpoint: string | null;
   targets: Record<string, string | null>;
-  labels: { branches: Record<string, string>; services: Record<string, string>; times: Record<string, string>; fields: Record<string, string>; intro: string };
+  labels: { branches: Record<string, string>; services: Record<string, string>; times: Record<string, string>; fields: Record<string, string>; intro: string; footer: string };
   messages: { errors: Record<string, string>; sending: string; successEndpoint: string; successWhatsapp: string; popupBlocked: string; openWhatsapp: string; errorEndpoint: string; notConfigured: string };
 }
 
@@ -186,6 +186,7 @@ function buildWaUrl(cfg: Config, target: string, p: Record<string, string>): str
   if (p.date) lines.push(`${L.fields.date}: ${p.date}`);
   lines.push(`${L.fields.time}: ${L.times[p.time] ?? p.time}`);
   if (p.notes) lines.push(`${L.fields.notes}: ${p.notes}`);
+  lines.push('', L.footer);
   return `https://wa.me/${encodeURIComponent(target)}?text=${encodeURIComponent(lines.join('\n'))}`;
 }
 

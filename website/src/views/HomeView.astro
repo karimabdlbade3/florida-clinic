@@ -2,6 +2,7 @@
 import type { Lang } from '../data/branches';
 import { branches } from '../data/branches';
 import { services } from '../data/services';
+import { media } from '../data/media';
 import { site } from '../config/site';
 import { t } from '../i18n/ui';
 import { localize, routes, whatsappLink } from '../lib/urls';
@@ -37,10 +38,8 @@ const schema = [{
         <p class="hero__tagline">{site.tagline[lang]}</p>
         <p class="lead">{h.lead}</p>
         <div class="btn-row hero__cta">
-          <a class="btn" href={localize(routes.contact, lang) + '#booking'} data-track="book_click"><Icon name="calendar" />{d.cta.book}</a>
-          {wa
-            ? <a class="btn btn--outline" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>
-            : <a class="btn btn--outline" href={localize(routes.services, lang)}>{d.cta.allServices}</a>}
+          {wa && <a class="btn" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>}
+          <a class:list={['btn', wa && 'btn--outline']} href={localize(routes.contact, lang) + '#booking'} data-track="book_click"><Icon name="calendar" />{wa ? d.cta.bookForm : d.cta.book}</a>
         </div>
         <dl class="hero__facts">
           {h.facts.map((f) => (
@@ -49,7 +48,7 @@ const schema = [{
         </dl>
       </div>
       <div class="hero__visual">
-        <PhotoSlot alt={d.placeholder.photo} shape="arch" ratio="4 / 5" motif="smile" loading="eager" />
+        <PhotoSlot src={media.hero ?? undefined} alt={d.placeholder.photo} shape="arch" ratio="4 / 5" motif="smile" loading="eager" />
         <div class="hero__badge" aria-hidden="true">
           <span class="hero__badge-icon"><Icon name="shield" /></span>
           <span>{lang === 'ar' ? site.tagline.shortAr : site.tagline.shortEn}</span>
@@ -62,7 +61,7 @@ const schema = [{
   <section class="section">
     <div class="container about-intro">
       <div class="reveal">
-        <PhotoSlot alt={d.placeholder.photo} ratio="5 / 4" motif="chair" />
+        <PhotoSlot src={media.homeAbout ?? undefined} alt={d.placeholder.photo} ratio="5 / 4" motif="chair" />
       </div>
       <div class="reveal" data-delay="1">
         <p class="eyebrow">{h.aboutEyebrow}</p>

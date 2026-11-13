@@ -16,8 +16,8 @@ const wa = whatsappLink(waMessage ?? d.whatsappDefault, waNumber);
       <h2>{title ?? d.home.finalTitle}</h2>
       <p>{text ?? d.home.finalText}</p>
       <div class="btn-row" style="margin-top:28px">
-        <a class="btn" href={bookHref ?? localize(routes.contact, lang) + '#booking'} data-track="book_click"><Icon name="calendar" />{d.cta.book}</a>
-        {wa && <a class="btn btn--light" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>}
+        {wa && <a class="btn" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>}
+        <a class:list={['btn', wa && 'btn--light']} href={bookHref ?? localize(routes.contact, lang) + '#booking'} data-track="book_click"><Icon name="calendar" />{wa ? d.cta.bookForm : d.cta.book}</a>
       </div>
     </div>
   </div>

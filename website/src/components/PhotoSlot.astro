@@ -26,7 +26,7 @@ const gid = 'phg-' + [...(alt + motif + ratio)].reduce((h, c) => (h * 31 + c.cha
   {src ? (
     <Picture src={src} alt={alt} formats={['avif', 'webp']} widths={[480, 800, 1200]} sizes={sizes} loading={loading} fetchpriority={loading === 'eager' ? 'high' : undefined} />
   ) : (
-    <div class="photo__ph" role="img" aria-label={alt}>
+    <div class="photo__ph" aria-hidden="true">
       <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
         <defs>
           <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1">

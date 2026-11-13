@@ -58,6 +58,7 @@ const schema = [{ '@type': 'ContactPage', name: d.contact.title, url: new URL(lo
               <li>
                 <h3><a href={localize(routes.branch(b.slug), lang)}>{b.name[lang]}</a>{b.isMain && <span class="tag" style="margin-inline-start:8px">{d.branches.main}</span>}</h3>
                 <p>{b.address ? b.address[lang] : <span class="ph">{d.placeholder.address}</span>}</p>
+                {b.address && lang !== 'ar' && <p lang="ar" dir="rtl">{b.address.ar}</p>}
                 <p>{b.phone ? <a href={btel!} dir="ltr" data-track="call_click">{b.phone}</a> : <span class="ph">{d.placeholder.phone}</span>}</p>
                 <p>{b.hours ? b.hours[lang].join(lang === 'ar' ? '، ' : ' · ') : <span class="ph">{d.placeholder.hours}</span>}</p>
                 {b.mapLink && <p><a href={b.mapLink} target="_blank" rel="noopener" data-track="directions_click">{d.cta.directions}</a></p>}

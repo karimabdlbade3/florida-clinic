@@ -31,8 +31,9 @@ npm run test:e2e          # full QA suite (needs Playwright + Chromium)
 | All interface text, page copy, SEO for main pages | `src/i18n/ui.ts` |
 | Brand name, tagline, working hours, booking WhatsApp, social links | `src/config/site.ts` |
 | Patient reviews (real, with consent only) | `src/data/testimonials.ts` |
-| Photos | `src/assets/photos/` (see README there) |
-| Logo | `src/components/Logo.astro` (temporary wordmark), `public/favicon.svg`, then `node scripts/make-brand-assets.mjs` |
+| Photos | `src/assets/photos/` folders, registered in `src/data/media.ts` (see README there) |
+| Doctors / team | `src/data/team.ts` (section appears once filled) |
+| Logo | Official artwork in `src/assets/brand/florida-logo-original.png`. After replacing it run `node scripts/make-brand-assets.mjs` (regenerates header/footer logo, icons, Open Graph image) |
 | Colors, fonts, spacing | `src/styles/global.css` (`:root` tokens) |
 
 Verified business data (addresses, branch phones, hours, Google Maps links, social profiles, booking WhatsApp)
@@ -125,11 +126,40 @@ Per-page titles and descriptions targeting each service and town, canonical URLs
 Open Graph and Twitter cards, `sitemap-index.xml` with language alternates, `robots.txt`, and JSON-LD:
 Organization, Dentist per branch (only verified fields), MedicalWebPage, FAQPage and BreadcrumbList.
 
+## Production environment variables
+
+| Variable | Required | Value |
+|---|---|---|
+| `SITE_URL` | **Yes** | Final domain with https, e.g. `https://www.your-domain.com` |
+| `PUBLIC_GSC_VERIFICATION` | No | Google Search Console HTML-tag code |
+| `PUBLIC_GA_ID` | No | GA4 ID. Enable only with a cookie/consent decision in place |
+| `PUBLIC_META_PIXEL_ID` | No | Meta Pixel ID. Same condition |
+| `PUBLIC_BOOKING_ENDPOINT` | No | Only when an appointment system exists |
+| `PUBLIC_WHATSAPP_NUMBER` | No | Leave unset: the official booking WhatsApp is built in |
+
+## Launch checklist
+
+**Mandatory before launch**
+1. Official production domain, set as `SITE_URL` (canonical URLs, sitemap and social previews depend on it).
+2. Management/legal approval of the privacy policy text.
+3. Clinical team sign-off on the service page texts.
+
+**Recommended**
+- Real clinic photography for the three branches.
+- Approved doctor names, titles and photos (`src/data/team.ts`).
+- Google Maps embed code per branch (`mapEmbedUrl`), Google Business Profile per branch and its review link.
+- Genuine patient testimonials with written consent (`src/data/testimonials.ts`; the section stays hidden until then).
+- Confirmation of the English spelling of street/shop names in branch addresses.
+
+**Optional / future**
+- Google Analytics, Meta Pixel, Search Console verification.
+- Appointment system integration, blog, branch-specific WhatsApp numbers, vector logo file.
+
 ## QA status (at handover)
 
-- `npm run test:e2e`: 629/629 checks pass. These cover the official business data (phones, maps, hours, WhatsApp,
-  social links, branch schema) in both languages, plus all 30 pages in both languages, HTTP status, console errors,
-  one H1 per page, meta tags, hreflang, JSON-LD validity, internal links, 404 handling, sitemap, mobile menu,
-  form validation, WhatsApp hand-off, endpoint success and failure, and the honeypot.
-- Lighthouse (mobile): Performance 97-100, Accessibility 100, Best Practices 100, SEO 100 on the pages tested.
-- No horizontal overflow at 320 / 360 / 390 / 768 / 1024 px.
+- `npm run test:e2e`: 810/810 checks pass: official business data (phones, maps, hours, WhatsApp, social links,
+  branch schema) in both languages, all 30 pages, no visible placeholders, no broken images, form validation and
+  WhatsApp hand-off with every field preserved, endpoint success/failure, 404, sitemap, and no horizontal overflow
+  at 320 / 375 / 390 / 768 / 1024 / 1440 px.
+- Lighthouse (mobile): Performance 99-100, Accessibility 100, Best Practices 100, SEO 100 on the five pages tested.
+- `npm audit`: 0 vulnerabilities.

@@ -3,6 +3,7 @@ import type { Lang } from '../data/branches';
 import { branches } from '../data/branches';
 import type { Service } from '../data/services';
 import { services } from '../data/services';
+import { media } from '../data/media';
 import { t } from '../i18n/ui';
 import { localize, routes } from '../lib/urls';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -58,7 +59,7 @@ const schema = [
         <p class="svc-avail"><Icon name="pin" />{S.availableAt}</p>
       </div>
       <div class="reveal" data-delay="1">
-        <PhotoSlot alt={`${s.name[lang]} - ${d.placeholder.photo}`} ratio="4 / 3" motif={s.icon === 'child' ? 'family' : s.icon === 'sparkle' ? 'smile' : 'tooth'} />
+        <PhotoSlot src={media.services[s.slug] ?? undefined} alt={`${s.name[lang]} - ${d.placeholder.photo}`} ratio="4 / 3" motif={s.icon === 'child' ? 'family' : s.icon === 'sparkle' ? 'smile' : 'tooth'} />
       </div>
     </div>
   </section>

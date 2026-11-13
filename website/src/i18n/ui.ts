@@ -12,7 +12,7 @@ const ar = {
   closeMenu: 'إغلاق القائمة',
   switchLang: 'English',
   switchLangLabel: 'View this page in English',
-  cta: { book: 'اطلب موعدًا', whatsapp: 'تواصل عبر واتساب', call: 'اتصل بنا', learnMore: 'اعرف المزيد', allServices: 'كل الخدمات', viewBranch: 'تفاصيل الفرع', bookHere: 'اطلب موعدًا في هذا الفرع', directions: 'الاتجاهات على الخريطة', openMap: 'افتح الموقع على خرائط جوجل', callBranch: 'اتصل بالفرع', bookWhatsapp: 'احجز عبر واتساب' },
+  cta: { book: 'اطلب موعدًا', whatsapp: 'تواصل عبر واتساب', call: 'اتصل بنا', learnMore: 'اعرف المزيد', allServices: 'كل الخدمات', viewBranch: 'تفاصيل الفرع', bookHere: 'اطلب موعدًا في هذا الفرع', directions: 'الاتجاهات على الخريطة', openMap: 'افتح الموقع على خرائط جوجل', callBranch: 'اتصل بالفرع', bookWhatsapp: 'احجز عبر واتساب', bookForm: 'نموذج طلب موعد' },
   placeholder: {
     address: 'العنوان التفصيلي: بانتظار التأكيد',
     phone: 'رقم الهاتف: بانتظار التأكيد',
@@ -87,7 +87,6 @@ const ar = {
       'نرحب دائمًا بملاحظاتك، ونستخدمها لتحسين خدماتنا في كل الفروع.',
     ],
     teamTitle: 'فريقنا الطبي',
-    teamText: 'سنعرض هنا فريق الأطباء ومؤهلاتهم بعد اعتماد البيانات الرسمية من الإدارة.',
   },
   services: {
     title: 'خدماتنا',
@@ -166,6 +165,7 @@ const ar = {
     errorEndpoint: 'تعذر إرسال الطلب حاليًا. يمكنك المحاولة مرة أخرى أو التواصل معنا مباشرة.',
     notConfigured: 'خدمة طلب المواعيد عبر الموقع غير مفعّلة بعد. سيتم تفعيلها فور إضافة رقم واتساب الرسمي للعيادة.',
     waIntro: 'مرحبًا عيادات فلوريدا، أرغب في طلب موعد:',
+    waFooter: 'هذا طلب موعد وليس حجزًا مؤكدًا، في انتظار تأكيد العيادة.',
     waFields: { name: 'الاسم', phone: 'الموبايل', branch: 'الفرع', service: 'الخدمة', date: 'اليوم المفضل', time: 'الوقت المفضل', notes: 'ملاحظات' },
   },
   whatsappDefault: 'مرحبًا عيادات فلوريدا، أرغب في الاستفسار عن',
@@ -209,7 +209,7 @@ const en: Dict = {
   closeMenu: 'Close menu',
   switchLang: 'العربية',
   switchLangLabel: 'عرض هذه الصفحة بالعربية',
-  cta: { book: 'Request an appointment', whatsapp: 'Chat on WhatsApp', call: 'Call us', learnMore: 'Learn more', allServices: 'All services', viewBranch: 'Branch details', bookHere: 'Request an appointment here', directions: 'Get directions', openMap: 'Open in Google Maps', callBranch: 'Call the branch', bookWhatsapp: 'Book on WhatsApp' },
+  cta: { book: 'Request an appointment', whatsapp: 'Chat on WhatsApp', call: 'Call us', learnMore: 'Learn more', allServices: 'All services', viewBranch: 'Branch details', bookHere: 'Request an appointment here', directions: 'Get directions', openMap: 'Open in Google Maps', callBranch: 'Call the branch', bookWhatsapp: 'Book on WhatsApp', bookForm: 'Appointment request form' },
   placeholder: {
     address: 'Full address: awaiting confirmation',
     phone: 'Phone number: awaiting confirmation',
@@ -284,7 +284,6 @@ const en: Dict = {
       'Your feedback is always welcome, and we use it to improve our care in every branch.',
     ],
     teamTitle: 'Our dental team',
-    teamText: 'Our dentists and their qualifications will be presented here once the official details are approved by management.',
   },
   services: {
     title: 'Our services',
@@ -363,6 +362,7 @@ const en: Dict = {
     errorEndpoint: 'We could not send your request right now. Please try again or contact us directly.',
     notConfigured: 'Online appointment requests are not active yet. They will be switched on as soon as the clinic’s official WhatsApp number is added.',
     waIntro: 'Hello Florida Dental Clinics, I would like to request an appointment:',
+    waFooter: 'This is an appointment request, not a confirmed booking. Awaiting confirmation from the clinic.',
     waFields: { name: 'Name', phone: 'Mobile', branch: 'Branch', service: 'Service', date: 'Preferred day', time: 'Preferred time', notes: 'Notes' },
   },
   whatsappDefault: 'Hello Florida Dental Clinics, I would like to ask about',

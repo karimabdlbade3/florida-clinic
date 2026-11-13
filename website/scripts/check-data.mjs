@@ -26,17 +26,17 @@ if (!/OFFICIAL_BOOKING_WHATSAPP = '20\d{10}'/.test(site) && !env.PUBLIC_WHATSAPP
 if (/\bphone: null/.test(site)) missing.push('General hotline number (optional: branch phones are shown)');
 if (/\bemail: null/.test(site)) missing.push('Official email address (optional)');
 if (/googleReviews: null/.test(site)) missing.push('Google Business Profile review link (for the "Share your experience" button)');
-if (/additional page/.test(site)) missing.push('Confirm what the second Facebook link is (labelled "additional page" for now)');
 if (!env.SITE_URL && !process.env.SITE_URL) missing.push('SITE_URL (final domain)');
 for (const k of ['PUBLIC_GA_ID', 'PUBLIC_META_PIXEL_ID', 'PUBLIC_GSC_VERIFICATION']) if (!env[k] && !process.env[k]) missing.push(`${k} (optional)`);
 missing.push('Confirm English transliteration of street/shop names in branch addresses');
 // Content
 if (/testimonials: Testimonial\[\] = \[\];/.test(read('src/data/testimonials.ts'))) missing.push('Testimonials (real, with written consent)');
-const photos = existsSync(resolve(root, 'src/assets/photos')) ? readdirSync(resolve(root, 'src/assets/photos')).filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f)) : [];
+const photos = existsSync(resolve(root, 'src/assets/photos')) ? readdirSync(resolve(root, 'src/assets/photos'), { recursive: true }).filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(String(f))) : [];
 if (!photos.length) missing.push('Real clinic photography (src/assets/photos)');
-missing.push('Official logo files (currently a temporary wordmark)');
-missing.push('Doctors: names, titles, qualifications (About page "team" placeholder)');
-missing.push('Privacy policy: data retention period + legal review');
+if (!existsSync(resolve(root, 'src/assets/brand/florida-logo-original.png'))) missing.push('Official logo file');
+missing.push('Vector logo (SVG/AI) from the designer (optional: sharper at very large sizes)');
+if (/team: TeamMember\[\] = \[\];/.test(read('src/data/team.ts'))) missing.push('Doctors: approved names, titles, photos (src/data/team.ts; section stays hidden until then)');
+missing.push('Privacy policy: management/legal approval (retention period, rights wording)');
 
 console.log(missing.length ? `Missing data (${missing.length}):\n- ` + missing.join('\n- ') : 'All business data present.');
 process.exit(missing.some((m) => !m.includes('optional')) ? 1 : 0);

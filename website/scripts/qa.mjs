@@ -115,7 +115,7 @@ const browser = await chromium.launch();
   }
   const nf = await fetch(base + '/does-not-exist/');
   ok('unknown URL returns 404 page', nf.status === 404);
-  for (const f of ['/robots.txt', '/sitemap-index.xml', '/sitemap-0.xml', '/og-image.png', '/favicon.svg', '/site.webmanifest']) {
+  for (const f of ['/robots.txt', '/sitemap-index.xml', '/sitemap-0.xml', '/og-image.png', '/favicon-32.png', '/apple-touch-icon.png', '/brand/logo-mark.webp', '/brand/logo-wordmark.webp', '/site.webmanifest']) {
     ok(`${f} exists`, (await fetch(base + f)).status === 200);
   }
   const sm = await (await fetch(base + '/sitemap-0.xml')).text();
@@ -275,6 +275,7 @@ const browser = await chromium.launch();
     ok(`${lang} home: working hours shown`, body.includes(hoursText));
     ok(`${lang} home: all 5 social links in footer`, socials.every((u) => links.includes(u)), JSON.stringify(socials.filter((u) => !links.includes(u))));
     ok(`${lang} home: social links open safely in new tab`, await page.evaluate(() => [...document.querySelectorAll('a[href*="facebook.com"],a[href*="instagram.com"],a[href*="tiktok.com"]')].every((a) => a.target === '_blank' && a.rel.includes('noopener'))));
+    ok(`${lang} home: additional Facebook link labelled as instructed`, await page.evaluate((l) => [...document.querySelectorAll('.site-footer a[href*="1A7BnaVqwj"]')].some((a) => a.textContent.trim() === l), lang === 'ar' ? 'صفحتنا على فيسبوك – رابط إضافي' : 'Our Facebook page – additional link'));
     ok(`${lang} home: two Instagram accounts labelled differently`, await page.evaluate(() => { const l = [...document.querySelectorAll('.site-footer a[href*="instagram.com"]')].map((a) => a.textContent.trim()); return l.length === 2 && l[0] !== l[1]; }));
     ok(`${lang} home: only the official WhatsApp number is used`, links.filter((l) => l.includes('wa.me')).every((l) => l.startsWith(WA)));
     ok(`${lang} home: no placeholders left for address/phone/hours`, (await page.$$('.branch-card .ph')).length === 0);
@@ -314,6 +315,58 @@ const browser = await chromium.launch();
     ok(`${lang} contact: form sends to official WhatsApp`, await page.evaluate(() => { const c = JSON.parse(document.querySelector('[data-booking-config]').textContent); return c.mode === 'whatsapp' && Object.values(c.targets).every((v) => v === '201554368176'); }));
     const org = (await ld()).find((x) => x['@type'] === 'Organization');
     ok(`${lang} contact: organization sameAs has all social links`, socials.every((u) => org?.sameAs?.includes(u)));
+  }
+  // No unfinished placeholders anywhere in the production build, no layout overflow
+  for (const path of pagesOf(dir)) {
+    await page.goto(base + path, { waitUntil: 'domcontentloaded' });
+    const r = await page.evaluate(() => ({
+      ph: document.querySelectorAll('.ph').length,
+      brackets: /\[[^\]]*(بانتظار|awaiting|TODO|placeholder)[^\]]*\]/i.test(document.body.innerText),
+      waiting: /بانتظار التأكيد|awaiting confirmation|lorem ipsum/i.test(document.body.innerText),
+      oldSpelling: document.documentElement.outerHTML.includes('كفر نجم'),
+      broken: [...document.images].filter((i) => i.complete && i.naturalWidth === 0).length,
+      logo: !!document.querySelector('.site-header img[src="/brand/logo-wordmark.webp"]'),
+      fakeReviews: document.querySelectorAll('.quote').length,
+    }));
+    ok(`${path} no visible placeholders`, r.ph === 0 && !r.brackets && !r.waiting, JSON.stringify(r));
+    ok(`${path} Kafr Negm spelled كفورنجم only`, !r.oldSpelling);
+    ok(`${path} no broken images, official logo present`, r.broken === 0 && r.logo, JSON.stringify(r));
+    ok(`${path} no testimonials without real data`, r.fakeReviews === 0);
+  }
+  for (const w of [320, 375, 390, 768, 1024, 1440]) {
+    const vp = await ctx.newPage();
+    await vp.setViewportSize({ width: w, height: 800 });
+    for (const path of ['/', '/en/', '/about/', '/services/orthodontics/', '/en/branches/kafr-negm/', '/contact/', '/en/contact/']) {
+      await vp.goto(base + path, { waitUntil: 'domcontentloaded' });
+      const [sw, cw] = await vp.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+      ok(`no horizontal overflow at ${w}px on ${path}`, sw <= cw, `${sw} > ${cw}`);
+    }
+    if (w <= 390) ok(`primary CTA visible without scrolling at ${w}px`, await vp.goto(base + '/').then(() => vp.evaluate(() => { const r = document.querySelector('.hero__cta a').getBoundingClientRect(); return r.bottom <= window.innerHeight && r.top >= 0; })));
+    await vp.close();
+  }
+  // Every submitted field reaches WhatsApp intact (Arabic preserved, correct encoding)
+  {
+    const mob = await browser.newContext(devices['iPhone 13']);
+    const mp = await mob.newPage();
+    await mp.goto(base + '/contact/');
+    await mp.evaluate(() => { window.__opened = []; window.open = (u) => { window.__opened.push(u); return null; }; });
+    await mp.fill('#bk-name', 'منى عبد الله & Co');
+    await mp.fill('#bk-phone', '01000000000');
+    await mp.selectOption('#bk-branch', 'kafr-negm');
+    await mp.selectOption('#bk-service', 'pediatric-dentistry');
+    await mp.fill('#bk-date', '2030-01-15');
+    await mp.selectOption('#bk-time', 'evening');
+    await mp.fill('#bk-notes', 'موعد لطفل #2 + سؤال؟');
+    await mp.check('#bk-consent');
+    await mp.click('[data-submit]');
+    const url = (await mp.evaluate(() => window.__opened))[0] || '';
+    const text = new URL(url || 'https://x/?text=').searchParams.get('text') || '';
+    ok('mobile: hand-off URL is the official wa.me link', url.startsWith(WA + '?text='), url.slice(0, 60));
+    ok('mobile: URL is fully percent-encoded', !/[\s&#+؟\u0600-\u06FF]/.test(url.split('?text=')[1] || ' '));
+    for (const part of ['منى عبد الله & Co', '01000000000', 'فرع كفورنجم', 'طب أسنان الأطفال', '2030-01-15', 'مساءً', 'موعد لطفل #2 + سؤال؟']) ok(`mobile: message keeps "${part}"`, text.includes(part), text);
+    ok('mobile: message says request, not confirmed', text.includes('طلب موعد وليس حجزًا مؤكدًا'));
+    ok('mobile: manual "open WhatsApp" link offered', !!(await mp.$('[data-form-status] a[href^="https://wa.me/201554368176"]')));
+    await mob.close();
   }
   // Real hand-off goes to the official number with the chosen branch named
   await page.goto(base + '/contact/?branch=zagazig');

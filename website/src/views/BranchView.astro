@@ -3,6 +3,7 @@ import type { Branch, Lang } from '../data/branches';
 import { branches } from '../data/branches';
 import { services } from '../data/services';
 import { site } from '../config/site';
+import { media } from '../data/media';
 import { t } from '../i18n/ui';
 import { localize, routes, whatsappLink, telLink } from '../lib/urls';
 import { branchSchema } from '../lib/schema';
@@ -82,7 +83,7 @@ const schema = [
           <iframe src={b.mapEmbedUrl!} title={B.mapTitle(b.name[lang])} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
         ) : (
           <div class="map-ph">
-            <PhotoSlot alt={b.mapLink ? B.mapTitle(b.name[lang]) : d.placeholder.map} ratio="4 / 3" motif="map" />
+            <PhotoSlot src={media.branches[b.slug] ?? undefined} alt={b.mapLink ? B.mapTitle(b.name[lang]) : d.placeholder.map} ratio="4 / 3" motif="map" />
             {b.mapLink ? (
               <div class="map-ph__cta">
                 <a class="btn" href={b.mapLink} target="_blank" rel="noopener" data-track="directions_click"><Icon name="pin" />{d.cta.openMap}</a>

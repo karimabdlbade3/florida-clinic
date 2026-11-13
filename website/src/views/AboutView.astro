@@ -1,6 +1,8 @@
 ---
 import type { Lang } from '../data/branches';
 import { branches } from '../data/branches';
+import { team } from '../data/team';
+import { media } from '../data/media';
 import { t } from '../i18n/ui';
 import { localize, routes } from '../lib/urls';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -32,7 +34,7 @@ const schema = [{
         {a.story.map((p) => <p class="lead">{p}</p>)}
       </div>
       <div class="reveal" data-delay="1">
-        <PhotoSlot alt={d.placeholder.photo} ratio="4 / 5" shape="arch" motif="tooth" />
+        <PhotoSlot src={media.aboutStory ?? undefined} alt={d.placeholder.photo} ratio="4 / 5" shape="arch" motif="tooth" />
       </div>
     </div>
   </section>
@@ -94,13 +96,28 @@ const schema = [{
         <h2>{a.experienceTitle}</h2>
         {a.experienceText.map((p) => <p class="lead">{p}</p>)}
       </div>
-      <div class="card team reveal" data-delay="1">
-        <span class="icon-badge"><Icon name="users" /></span>
-        <h3>{a.teamTitle}</h3>
-        <p><span class="ph">{a.teamText}</span></p>
+      <div class="reveal" data-delay="1">
+        <PhotoSlot src={media.aboutCare ?? undefined} alt={d.placeholder.photo} ratio="5 / 4" motif="family" />
       </div>
     </div>
   </section>
+
+  {team.length > 0 && (
+    <section class="section section--ivory" aria-labelledby="team-title">
+      <div class="container">
+        <h2 id="team-title" class="reveal">{a.teamTitle}</h2>
+        <div class="grid grid--3">
+          {team.map((m) => (
+            <article class="card reveal">
+              {m.photo && <PhotoSlot src={m.photo} alt={m.name[lang]} ratio="1 / 1" />}
+              <h3 style="margin-top:18px">{m.name[lang]}</h3>
+              <p>{m.title[lang]}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <CtaBand lang={lang} />
 </BaseLayout>

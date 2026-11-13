@@ -65,8 +65,8 @@ export const site = {
 
   /** Official social profiles (tracking parameters removed from the shared links). */
   social: [
-    { key: 'facebook', label: { ar: 'فيسبوك', en: 'Facebook' }, url: 'https://www.facebook.com/share/1FwUJnTprm/' },
-    { key: 'facebook-2', label: { ar: 'فيسبوك (صفحة إضافية)', en: 'Facebook (additional page)' }, url: 'https://www.facebook.com/share/1A7BnaVqwj/' },
+    { key: 'facebook', label: { ar: 'فيسبوك العيادات', en: 'Facebook (clinics)' }, url: 'https://www.facebook.com/share/1FwUJnTprm/' },
+    { key: 'facebook-2', label: { ar: 'صفحتنا على فيسبوك – رابط إضافي', en: 'Our Facebook page – additional link' }, url: 'https://www.facebook.com/share/1A7BnaVqwj/' },
     { key: 'instagram', label: { ar: 'انستجرام العيادات', en: 'Instagram (clinics)' }, url: 'https://www.instagram.com/floridadentalclinics' },
     { key: 'instagram-ortho', label: { ar: 'انستجرام تقويم الأسنان', en: 'Instagram (orthodontics)' }, url: 'https://www.instagram.com/dr.mahmoudabdelbadea' },
     { key: 'tiktok', label: { ar: 'تيك توك', en: 'TikTok' }, url: 'https://www.tiktok.com/@floridadentalclinics' },

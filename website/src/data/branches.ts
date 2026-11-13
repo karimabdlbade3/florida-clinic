@@ -44,7 +44,7 @@ export const branches: Branch[] = [
     locality: { ar: 'الإبراهيمية', en: 'Ibrahimia' },
     region: { ar: 'الشرقية', en: 'Sharqia' },
     address: {
-      ar: 'الإبراهيمية، شارع حلواني أبو حازم، أمام السبيلي للأحذية، فوق محل هيلثي للألبان.',
+      ar: 'الإبراهيمية – شارع حلواني أبو حازم – أمام السبيلي للأحذية – فوق محل هيلثي للألبان.',
       en: "Ibrahimia, Halawani Abu Hazem Street, opposite El-Sebaily Shoes, above Healthy Dairy shop.",
     },
     landmark: null,
@@ -72,7 +72,7 @@ export const branches: Branch[] = [
     locality: { ar: 'الزقازيق', en: 'Zagazig' },
     region: { ar: 'الشرقية', en: 'Sharqia' },
     address: {
-      ar: 'الزقازيق، المحطة، أعلى الطاهر للبصريات، الدور الثامن.',
+      ar: 'الزقازيق – المحطة – أعلى الطاهر للبصريات – الدور الثامن.',
       en: "Zagazig, El-Mahatta (station area), above El-Taher Optics, 8th floor.",
     },
     landmark: null,
@@ -100,7 +100,7 @@ export const branches: Branch[] = [
     locality: { ar: 'كفورنجم', en: 'Kafr Negm' },
     region: { ar: 'الشرقية', en: 'Sharqia' },
     address: {
-      ar: 'كفورنجم، بجوار الموقف، أمام صيدلية دكتور عبدالحميد دسوقي، فوق كافيه صافي.',
+      ar: 'كفورنجم – بجوار الموقف – أمام صيدلية دكتور عبدالحميد دسوقي – فوق كافيه صافي.',
       en: "Kafr Negm, next to the bus station (El-Mawqaf), opposite Dr. Abdelhamid Desouky Pharmacy, above Safi Café.",
     },
     landmark: null,
