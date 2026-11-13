@@ -148,7 +148,7 @@ export const services: Service[] = [
       ],
     },
     seo: {
-      title: { ar: 'تجميل الأسنان وتبييضها والفينير | عيادات فلوريدا لطب الأسنان', en: 'Cosmetic Dentistry, Whitening & Veneers | Florida Dental Clinics' },
+      title: { ar: 'تجميل الأسنان وتبييضها والفينير | عيادات فلوريدا لطب وتقويم الأسنان', en: 'Cosmetic Dentistry, Whitening & Veneers | Florida Dental Clinics' },
       description: {
         ar: 'تجميل الأسنان في عيادات فلوريدا: تبييض، فينير، حشوات تجميلية وتصميم ابتسامة طبيعية بعد فحص صحة الأسنان واللثة. فروع الإبراهيمية والزقازيق وكفورنجم.',
         en: 'Cosmetic dentistry at Florida Dental Clinics: whitening, veneers, tooth-coloured fillings and natural smile design after a full check-up. Branches in Ibrahimia, Zagazig and Kafr Negm.',
@@ -213,7 +213,7 @@ export const services: Service[] = [
       ],
     },
     seo: {
-      title: { ar: 'زراعة الأسنان في الشرقية | عيادات فلوريدا لطب الأسنان', en: 'Dental Implants in Sharqia | Florida Dental Clinics' },
+      title: { ar: 'زراعة الأسنان في الشرقية | عيادات فلوريدا لطب وتقويم الأسنان', en: 'Dental Implants in Sharqia | Florida Dental Clinics' },
       description: {
         ar: 'زراعة الأسنان في عيادات فلوريدا بعد تقييم دقيق للعظم واللثة والصحة العامة. تعويض ثابت للأسنان المفقودة. فروع الإبراهيمية والزقازيق وكفورنجم.',
         en: 'Dental implants at Florida Dental Clinics, planned after careful assessment of bone, gums and general health. Fixed replacement for missing teeth in Ibrahimia, Zagazig and Kafr Negm.',
@@ -278,7 +278,7 @@ export const services: Service[] = [
       ],
     },
     seo: {
-      title: { ar: 'جراحة الفم وخلع ضرس العقل | عيادات فلوريدا لطب الأسنان', en: 'Oral Surgery & Wisdom Tooth Removal | Florida Dental Clinics' },
+      title: { ar: 'جراحة الفم وخلع ضرس العقل | عيادات فلوريدا لطب وتقويم الأسنان', en: 'Oral Surgery & Wisdom Tooth Removal | Florida Dental Clinics' },
       description: {
         ar: 'الخلع العادي والجراحي وخلع ضرس العقل في عيادات فلوريدا، مع التزام بالتعقيم وشرح واضح للإجراء. فروع الإبراهيمية والزقازيق وكفورنجم.',
         en: 'Routine and surgical extractions and wisdom tooth removal at Florida Dental Clinics, with strict sterilisation and clear explanations. Ibrahimia, Zagazig and Kafr Negm.',

@@ -12,7 +12,7 @@ const ar = {
   closeMenu: 'إغلاق القائمة',
   switchLang: 'English',
   switchLangLabel: 'View this page in English',
-  cta: { book: 'اطلب موعدًا', whatsapp: 'تواصل عبر واتساب', call: 'اتصل بنا', learnMore: 'اعرف المزيد', allServices: 'كل الخدمات', viewBranch: 'تفاصيل الفرع', bookHere: 'اطلب موعدًا في هذا الفرع', directions: 'الاتجاهات على الخريطة' },
+  cta: { book: 'اطلب موعدًا', whatsapp: 'تواصل عبر واتساب', call: 'اتصل بنا', learnMore: 'اعرف المزيد', allServices: 'كل الخدمات', viewBranch: 'تفاصيل الفرع', bookHere: 'اطلب موعدًا في هذا الفرع', directions: 'الاتجاهات على الخريطة', openMap: 'افتح الموقع على خرائط جوجل', callBranch: 'اتصل بالفرع', bookWhatsapp: 'احجز عبر واتساب' },
   placeholder: {
     address: 'العنوان التفصيلي: بانتظار التأكيد',
     phone: 'رقم الهاتف: بانتظار التأكيد',
@@ -23,7 +23,7 @@ const ar = {
   home: {
     eyebrow: 'منذ 2020 · ثلاثة فروع في الشرقية',
     title: 'ابتسامة واثقة تبدأ برعاية تهتم بك',
-    lead: 'في عيادات فلوريدا لطب الأسنان نجمع بين الرعاية الطبية الدقيقة والاهتمام الحقيقي بتجربتك، في التقويم والتجميل والزراعة وطب أسنان الأطفال وكل ما تحتاجه أسنانك.',
+    lead: 'في عيادات فلوريدا لطب وتقويم الأسنان نجمع بين الرعاية الطبية الدقيقة والاهتمام الحقيقي بتجربتك، في التقويم والتجميل والزراعة وطب أسنان الأطفال وكل ما تحتاجه أسنانك.',
     facts: [
       { value: '2020', label: 'سنة التأسيس' },
       { value: '3', label: 'فروع قريبة منك' },
@@ -65,10 +65,10 @@ const ar = {
   ],
   about: {
     title: 'من نحن',
-    lead: 'عيادات فلوريدا لطب الأسنان: رعاية متكاملة تجمع بين جودة العلاج واحترام المريض.',
+    lead: 'عيادات فلوريدا لطب وتقويم الأسنان: رعاية متكاملة تجمع بين جودة العلاج واحترام المريض.',
     storyTitle: 'قصتنا',
     story: [
-      'تأسست عيادات فلوريدا لطب الأسنان عام 2020 في الإبراهيمية، بهدف تقديم رعاية أسنان متكاملة يشعر فيها المريض بالاطمئنان والاحترام من أول زيارة.',
+      'تأسست عيادات فلوريدا لطب وتقويم الأسنان عام 2020 في الإبراهيمية، بهدف تقديم رعاية أسنان متكاملة يشعر فيها المريض بالاطمئنان والاحترام من أول زيارة.',
       'مع ثقة المرضى وزيادة الطلب، توسعنا إلى ثلاثة فروع في الإبراهيمية والزقازيق وكفورنجم، مع الحفاظ على نفس أسلوب العمل ونفس معايير الرعاية في كل فرع.',
     ],
     timeline: [
@@ -113,6 +113,9 @@ const ar = {
     services: 'الخدمات المتاحة',
     map: 'الموقع على الخريطة',
     otherBranches: 'فروع أخرى',
+    bookingWa: 'واتساب الحجز (لجميع الفروع)',
+    phoneLabel: 'هاتف الفرع',
+    mapNote: 'اضغط على الزر لفتح موقع الفرع والاتجاهات على خرائط جوجل.',
     mapTitle: (name: string) => `خريطة ${name}`,
   },
   contact: {
@@ -122,6 +125,8 @@ const ar = {
     formNote: 'هذا طلب موعد وليس حجزًا مؤكدًا. سيتواصل معك فريق الفرع لتأكيد اليوم والوقت.',
     channelsTitle: 'طرق التواصل',
     branchesTitle: 'بيانات الفروع',
+    hoursTitle: 'مواعيد العمل',
+    socialTitle: 'تابعنا',
   },
   form: {
     name: 'الاسم',
@@ -168,6 +173,8 @@ const ar = {
   footer: {
     tagline: 'رعاية أسنان متكاملة منذ 2020، في الإبراهيمية والزقازيق وكفورنجم.',
     explore: 'روابط',
+    follow: 'تابعنا',
+    hours: 'مواعيد العمل',
     services: 'الخدمات',
     branches: 'الفروع',
     privacy: 'سياسة الخصوصية',
@@ -178,18 +185,18 @@ const ar = {
   notFound: { title: 'الصفحة غير موجودة', text: 'ربما تم نقل الصفحة أو أن الرابط غير صحيح.', back: 'العودة إلى الرئيسية' },
   privacy: { title: 'سياسة الخصوصية' },
   seo: {
-    homeTitle: 'عيادات فلوريدا لطب الأسنان | الإبراهيمية، الزقازيق، كفورنجم',
-    homeDesc: 'عيادات فلوريدا لطب الأسنان منذ 2020: تقويم، تجميل، زراعة، جراحة الفم، أسنان الأطفال وطب الأسنان العام في فروع الإبراهيمية والزقازيق وكفورنجم. اطلب موعدك الآن.',
-    aboutTitle: 'من نحن | عيادات فلوريدا لطب الأسنان',
-    aboutDesc: 'تعرّف على قصة عيادات فلوريدا لطب الأسنان منذ تأسيسها عام 2020، ورؤيتنا وقيمنا واهتمامنا بتجربة المريض في فروعنا الثلاثة.',
+    homeTitle: 'عيادات فلوريدا لطب وتقويم الأسنان | الإبراهيمية، الزقازيق، كفورنجم',
+    homeDesc: 'عيادات فلوريدا لطب وتقويم الأسنان منذ 2020: تقويم، تجميل، زراعة، جراحة الفم، أسنان الأطفال وطب الأسنان العام في فروع الإبراهيمية والزقازيق وكفورنجم. اطلب موعدك الآن.',
+    aboutTitle: 'من نحن | عيادات فلوريدا لطب وتقويم الأسنان',
+    aboutDesc: 'تعرّف على قصة عيادات فلوريدا لطب وتقويم الأسنان منذ تأسيسها عام 2020، ورؤيتنا وقيمنا واهتمامنا بتجربة المريض في فروعنا الثلاثة.',
     servicesTitle: 'خدمات طب الأسنان | عيادات فلوريدا',
     servicesDesc: 'تقويم الأسنان، تجميل الأسنان، زراعة الأسنان، جراحة الفم، طب أسنان الأطفال وطب الأسنان العام في عيادات فلوريدا بالشرقية.',
-    branchesTitle: 'فروع عيادات فلوريدا لطب الأسنان | الإبراهيمية، الزقازيق، كفورنجم',
-    branchesDesc: 'فروع عيادات فلوريدا لطب الأسنان في الإبراهيمية (الفرع الرئيسي) والزقازيق وكفورنجم. العناوين ومواعيد العمل وطرق التواصل.',
-    contactTitle: 'اطلب موعدًا | عيادات فلوريدا لطب الأسنان',
-    contactDesc: 'اطلب موعدك في عيادات فلوريدا لطب الأسنان: اختر الفرع والخدمة والموعد المناسب، أو تواصل معنا مباشرة عبر واتساب.',
-    privacyTitle: 'سياسة الخصوصية | عيادات فلوريدا لطب الأسنان',
-    privacyDesc: 'كيف تتعامل عيادات فلوريدا لطب الأسنان مع البيانات التي ترسلها عبر الموقع.',
+    branchesTitle: 'فروع عيادات فلوريدا لطب وتقويم الأسنان | الإبراهيمية، الزقازيق، كفورنجم',
+    branchesDesc: 'فروع عيادات فلوريدا لطب وتقويم الأسنان في الإبراهيمية (الفرع الرئيسي) والزقازيق وكفورنجم. العناوين وأرقام الهاتف ومواعيد العمل: من السبت إلى الخميس 2 ظهرًا حتى 10 مساءً.',
+    contactTitle: 'اطلب موعدًا | عيادات فلوريدا لطب وتقويم الأسنان',
+    contactDesc: 'اطلب موعدك في عيادات فلوريدا لطب وتقويم الأسنان: اختر الفرع والخدمة والموعد المناسب، أو تواصل معنا مباشرة عبر واتساب.',
+    privacyTitle: 'سياسة الخصوصية | عيادات فلوريدا لطب وتقويم الأسنان',
+    privacyDesc: 'كيف تتعامل عيادات فلوريدا لطب وتقويم الأسنان مع البيانات التي ترسلها عبر الموقع.',
   },
 };
 
@@ -202,7 +209,7 @@ const en: Dict = {
   closeMenu: 'Close menu',
   switchLang: 'العربية',
   switchLangLabel: 'عرض هذه الصفحة بالعربية',
-  cta: { book: 'Request an appointment', whatsapp: 'Chat on WhatsApp', call: 'Call us', learnMore: 'Learn more', allServices: 'All services', viewBranch: 'Branch details', bookHere: 'Request an appointment here', directions: 'Get directions' },
+  cta: { book: 'Request an appointment', whatsapp: 'Chat on WhatsApp', call: 'Call us', learnMore: 'Learn more', allServices: 'All services', viewBranch: 'Branch details', bookHere: 'Request an appointment here', directions: 'Get directions', openMap: 'Open in Google Maps', callBranch: 'Call the branch', bookWhatsapp: 'Book on WhatsApp' },
   placeholder: {
     address: 'Full address: awaiting confirmation',
     phone: 'Phone number: awaiting confirmation',
@@ -303,6 +310,9 @@ const en: Dict = {
     services: 'Available services',
     map: 'Location',
     otherBranches: 'Other branches',
+    bookingWa: 'Booking WhatsApp (all branches)',
+    phoneLabel: 'Branch phone',
+    mapNote: 'Use the button to open the branch location and directions in Google Maps.',
     mapTitle: (name: string) => `Map of ${name}`,
   },
   contact: {
@@ -312,6 +322,8 @@ const en: Dict = {
     formNote: 'This is an appointment request, not a confirmed booking. The branch team will contact you to confirm the day and time.',
     channelsTitle: 'Ways to reach us',
     branchesTitle: 'Branch details',
+    hoursTitle: 'Opening hours',
+    socialTitle: 'Follow us',
   },
   form: {
     name: 'Name',
@@ -358,6 +370,8 @@ const en: Dict = {
   footer: {
     tagline: 'Complete dental care since 2020, in Ibrahimia, Zagazig and Kafr Negm.',
     explore: 'Explore',
+    follow: 'Follow us',
+    hours: 'Opening hours',
     services: 'Services',
     branches: 'Branches',
     privacy: 'Privacy policy',
@@ -375,7 +389,7 @@ const en: Dict = {
     servicesTitle: 'Dental Services | Florida Dental Clinics',
     servicesDesc: 'Orthodontics, cosmetic dentistry, dental implants, oral surgery, pediatric dentistry and general dentistry at Florida Dental Clinics in Sharqia, Egypt.',
     branchesTitle: 'Florida Dental Clinics Branches | Ibrahimia, Zagazig, Kafr Negm',
-    branchesDesc: 'Florida Dental Clinics branches in Ibrahimia (main branch), Zagazig and Kafr Negm: addresses, opening hours and contact details.',
+    branchesDesc: 'Florida Dental Clinics branches in Ibrahimia (main branch), Zagazig and Kafr Negm: addresses, phone numbers and opening hours (Saturday to Thursday, 2 PM to 10 PM).',
     contactTitle: 'Request an Appointment | Florida Dental Clinics',
     contactDesc: 'Request an appointment at Florida Dental Clinics: choose your branch, service and preferred time, or message us on WhatsApp.',
     privacyTitle: 'Privacy Policy | Florida Dental Clinics',

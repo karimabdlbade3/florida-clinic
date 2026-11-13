@@ -18,30 +18,61 @@ export function toIntlEgypt(raw: string | null | undefined): string | null {
   return null; // landlines or invalid values are not valid WhatsApp targets
 }
 
+/** Env value "none" switches WhatsApp off entirely (used by the QA suite). */
+const envWa = (env.PUBLIC_WHATSAPP_NUMBER || '').trim();
+/** Official booking WhatsApp: https://wa.me/201554368176 */
+const OFFICIAL_BOOKING_WHATSAPP = '201554368176';
+
 export const site = {
   brand: {
     en: 'Florida Dental Clinics',
-    ar: 'عيادات فلوريدا لطب الأسنان',
+    ar: 'عيادات فلوريدا لطب وتقويم الأسنان',
     shortEn: 'Florida Dental',
     shortAr: 'فلوريدا',
   },
+  /** Official tagline (Arabic is the verified original; English is its translation). */
+  tagline: {
+    ar: 'عيادات فلوريدا لطب وتقويم الأسنان جنبك في كل مكان',
+    en: 'Florida Dental Clinics, by your side wherever you are',
+    shortAr: 'جنبك في كل مكان',
+    shortEn: 'By your side, wherever you are',
+  },
   foundedYear: 2020,
 
+  /** Official working hours, identical for all branches. */
+  hours: {
+    lines: {
+      ar: ['السبت إلى الخميس: من 2 ظهرًا حتى 10 مساءً', 'الجمعة: مغلق'],
+      en: ['Saturday to Thursday: 2:00 PM to 10:00 PM', 'Friday: Closed'],
+    },
+    /** Official wording supplied by the clinic. */
+    sentence: {
+      ar: 'يوميًا من الساعة 2 ظهرًا حتى 10 مساءً، ما عدا الجمعة، بمواعيد حجز مسبقة حرصًا على راحتكم.',
+      en: 'Open daily from 2:00 PM to 10:00 PM, except Fridays. Visits are by prior appointment, for your comfort.',
+    },
+    note: { ar: 'بمواعيد حجز مسبقة', en: 'By prior appointment' },
+    /** schema.org openingHoursSpecification */
+    schema: { days: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], opens: '14:00', closes: '22:00' },
+  },
+
   contact: {
-    /** Main WhatsApp Business number. Env var overrides this value. */
-    whatsapp: toIntlEgypt(env.PUBLIC_WHATSAPP_NUMBER) ?? toIntlEgypt(null /* or put the number here, e.g. '01XXXXXXXXX' */),
-    /** Main hotline, Egyptian format as it should be displayed, e.g. "0100 000 0000". */
+    /** Central booking WhatsApp for all branches. Env var overrides; "none" disables. */
+    whatsapp: envWa.toLowerCase() === 'none' ? null : toIntlEgypt(envWa) ?? OFFICIAL_BOOKING_WHATSAPP,
+    /** General hotline (not supplied). Branch phones live in data/branches.ts. */
     phone: null as string | null,
     email: null as string | null,
   },
 
-  social: {
-    facebook: null as string | null,
-    instagram: null as string | null,
-    tiktok: null as string | null,
-    /** Google Business Profile review link (used for "Leave a review"). */
-    googleReviews: null as string | null,
-  },
+  /** Official social profiles (tracking parameters removed from the shared links). */
+  social: [
+    { key: 'facebook', label: { ar: 'فيسبوك', en: 'Facebook' }, url: 'https://www.facebook.com/share/1FwUJnTprm/' },
+    { key: 'facebook-2', label: { ar: 'فيسبوك (صفحة إضافية)', en: 'Facebook (additional page)' }, url: 'https://www.facebook.com/share/1A7BnaVqwj/' },
+    { key: 'instagram', label: { ar: 'انستجرام العيادات', en: 'Instagram (clinics)' }, url: 'https://www.instagram.com/floridadentalclinics' },
+    { key: 'instagram-ortho', label: { ar: 'انستجرام تقويم الأسنان', en: 'Instagram (orthodontics)' }, url: 'https://www.instagram.com/dr.mahmoudabdelbadea' },
+    { key: 'tiktok', label: { ar: 'تيك توك', en: 'TikTok' }, url: 'https://www.tiktok.com/@floridadentalclinics' },
+  ] as { key: string; label: { ar: string; en: string }; url: string }[],
+  /** Google Business Profile review link (used for "Leave a review"). Not supplied yet. */
+  googleReviews: null as string | null,
 
   integrations: {
     gaId: (env.PUBLIC_GA_ID || '').trim() || null,

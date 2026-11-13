@@ -46,8 +46,9 @@ const orgSchema = {
   url: siteUrl.href,
   logo: new URL('/brand/logo-mark.png', siteUrl).href,
   foundingDate: String(site.foundedYear),
-  ...(site.contact.phone ? { telephone: site.contact.phone } : {}),
-  sameAs: [site.social.facebook, site.social.instagram, site.social.tiktok].filter(Boolean),
+  slogan: site.tagline[lang],
+  ...(site.contact.whatsapp ? { contactPoint: { '@type': 'ContactPoint', contactType: 'reservations', telephone: '+' + site.contact.whatsapp, availableLanguage: ['ar', 'en'] } } : {}),
+  sameAs: site.social.map((x) => x.url),
 };
 const ldJson = (o: unknown) => JSON.stringify(o).replace(/</g, '\\u003c');
 ---

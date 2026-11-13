@@ -4,7 +4,7 @@ import { localize, routes } from './urls';
 
 /**
  * schema.org Dentist (LocalBusiness) for a branch.
- * Only real data is emitted: unknown street address / phone / hours are omitted.
+ * Only verified data is emitted; anything unknown is omitted.
  */
 export function branchSchema(b: Branch, lang: Lang, siteUrl: URL) {
   const url = new URL(localize(routes.branch(b.slug), lang), siteUrl).href;
@@ -23,7 +23,9 @@ export function branchSchema(b: Branch, lang: Lang, siteUrl: URL) {
       addressCountry: 'EG',
     },
     areaServed: b.locality[lang],
-    ...(b.phone ? { telephone: b.phone } : {}),
+    ...(b.phone ? { telephone: '+2' + b.phone.replace(/\D/g, '') } : {}),
+    ...(b.hours ? { openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: site.hours.schema.days, opens: site.hours.schema.opens, closes: site.hours.schema.closes }] } : {}),
+    slogan: site.tagline[lang],
     ...(b.mapLink ? { hasMap: b.mapLink } : {}),
     medicalSpecialty: 'Dentistry',
   };

@@ -29,14 +29,18 @@ npm run test:e2e          # full QA suite (needs Playwright + Chromium)
 | Branch address, phone, WhatsApp, hours, maps | `src/data/branches.ts` |
 | Service texts (AR/EN), FAQs, SEO titles | `src/data/services.ts` |
 | All interface text, page copy, SEO for main pages | `src/i18n/ui.ts` |
-| Main phone/WhatsApp, email, social links | `src/config/site.ts` (or `.env`) |
+| Brand name, tagline, working hours, booking WhatsApp, social links | `src/config/site.ts` |
 | Patient reviews (real, with consent only) | `src/data/testimonials.ts` |
 | Photos | `src/assets/photos/` (see README there) |
 | Logo | `src/components/Logo.astro` (temporary wordmark), `public/favicon.svg`, then `node scripts/make-brand-assets.mjs` |
 | Colors, fonts, spacing | `src/styles/global.css` (`:root` tokens) |
 
-Unknown data is kept as `null` and shows as a clearly marked placeholder
-("بانتظار التأكيد"). Nothing about addresses, phones, hours, doctors or reviews is invented.
+Verified business data (addresses, branch phones, hours, Google Maps links, social profiles, booking WhatsApp)
+is in place. Anything still unknown is kept as `null` and shows as a clearly marked placeholder
+("بانتظار التأكيد"). Nothing about doctors or reviews is invented.
+
+Branch phone numbers are used for `tel:` calls only. All WhatsApp buttons and the booking form use the single
+official booking WhatsApp unless a branch gets its own `whatsapp` value.
 
 ## How booking works (honest by design)
 
@@ -61,7 +65,7 @@ Set these as environment variables on the host (or in `.env`), then rebuild:
 | Variable | Purpose |
 |---|---|
 | `SITE_URL` | Final domain, e.g. `https://www.example.com` (canonical URLs, sitemap, Open Graph). **Required before launch.** |
-| `PUBLIC_WHATSAPP_NUMBER` | Main WhatsApp Business number, e.g. `01XXXXXXXXX` |
+| `PUBLIC_WHATSAPP_NUMBER` | Optional override of the booking WhatsApp set in `src/config/site.ts`. `none` switches WhatsApp off. |
 | `PUBLIC_GA_ID` | Google Analytics 4 (`G-XXXXXXX`) |
 | `PUBLIC_META_PIXEL_ID` | Meta Pixel ID |
 | `PUBLIC_GSC_VERIFICATION` | Google Search Console HTML-tag code |
@@ -94,7 +98,8 @@ Configure the headers from `public/_headers` in `.htaccess` and set `404.html` a
 1. Google Search Console: verify the domain, then submit `https://YOUR-DOMAIN/sitemap-index.xml`.
 2. Create or claim a **Google Business Profile for each branch** with the same name, address and phone as the site.
    This matters more for local search ("دكتور أسنان في الزقازيق") than anything on the website.
-3. Paste each branch's Google Maps embed URL and share link into `src/data/branches.ts`.
+3. Paste each branch's Google Maps embed URL (Share > Embed a map) into `mapEmbedUrl` in `src/data/branches.ts`
+   to show the map inside the page. The share links are already in place.
 4. If you add a booking endpoint on another domain, add its origin to `connect-src` in `public/_headers` / `vercel.json`.
 
 ## Project structure
@@ -122,7 +127,8 @@ Organization, Dentist per branch (only verified fields), MedicalWebPage, FAQPage
 
 ## QA status (at handover)
 
-- `npm run test:e2e`: 522/522 checks pass. These cover all 30 pages in both languages, HTTP status, console errors,
+- `npm run test:e2e`: 629/629 checks pass. These cover the official business data (phones, maps, hours, WhatsApp,
+  social links, branch schema) in both languages, plus all 30 pages in both languages, HTTP status, console errors,
   one H1 per page, meta tags, hreflang, JSON-LD validity, internal links, 404 handling, sitemap, mobile menu,
   form validation, WhatsApp hand-off, endpoint success and failure, and the honeypot.
 - Lighthouse (mobile): Performance 97-100, Accessibility 100, Best Practices 100, SEO 100 on the pages tested.

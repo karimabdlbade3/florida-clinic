@@ -10,8 +10,8 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
 const list = testimonials.filter((x) => x.lang === lang).slice(0, 6);
-const reviewHref = site.social.googleReviews ?? localize(routes.contact, lang);
-const external = Boolean(site.social.googleReviews);
+const reviewHref = site.googleReviews ?? localize(routes.contact, lang);
+const external = Boolean(site.googleReviews);
 ---
 <section class="section section--ivory" aria-labelledby="testimonials-title">
   <div class="container">

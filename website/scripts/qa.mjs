@@ -1,8 +1,9 @@
 /**
  * End-to-end QA. Builds three variants and tests them in Chromium:
- *   A) no contact data configured (honest placeholders, form disabled)
+ *   A) WhatsApp switched off (PUBLIC_WHATSAPP_NUMBER=none): form disabled, no wa.me links
  *   B) WhatsApp configured (float button, validation, WhatsApp hand-off)
  *   C) booking endpoint configured (POST success + failure handling, mocked)
+ *   D) the real production configuration: official phones, WhatsApp, maps, hours, social links
  * Plus, on every page: HTTP 200, console errors, one <h1>, title/description,
  * canonical + hreflang, lang/dir, internal links resolve, images have alt.
  *
@@ -23,7 +24,7 @@ const results = [];
 const ok = (name, cond, detail = '') => { results.push({ name, pass: !!cond, detail }); if (!cond) console.log('  FAIL', name, detail); };
 
 function build(outDir, env) {
-  execSync(`npx astro build --outDir ${outDir}`, { cwd: root, stdio: 'pipe', env: { ...process.env, PUBLIC_WHATSAPP_NUMBER: '', PUBLIC_BOOKING_ENDPOINT: '', ...env } });
+  execSync(`npx astro build --outDir ${outDir}`, { cwd: root, stdio: 'pipe', env: { ...process.env, PUBLIC_WHATSAPP_NUMBER: 'none', PUBLIC_BOOKING_ENDPOINT: '', ...env } });
 }
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.woff': 'font/woff', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json' };
 function serve(dir, port) {
@@ -60,7 +61,7 @@ const browser = await chromium.launch();
   const srv = await serve(dir, 4401);
   const base = 'http://localhost:4401';
   const pages = pagesOf(dir);
-  console.log(`A) ${pages.length} pages, no contact data`);
+  console.log(`A) ${pages.length} pages, WhatsApp switched off`);
   ok('page count (2 langs x 15)', pages.length === 30, String(pages.length));
   const ctx = await browser.newContext();
   const linkSet = new Set();
@@ -234,6 +235,96 @@ const browser = await chromium.launch();
     }
     await ctx.close();
   }
+  srv.close();
+}
+
+// ---------- D: official business data (default production build) ----------
+{
+  build('qa-output/dist-d', { PUBLIC_WHATSAPP_NUMBER: '' });
+  const dir = join(root, 'qa-output/dist-d');
+  const srv = await serve(dir, 4404);
+  const base = 'http://localhost:4404';
+  console.log('D) official business data');
+  const WA = 'https://wa.me/201554368176';
+  const official = {
+    ibrahimia: { phone: '01148770555', map: 'https://maps.app.goo.gl/KSvaNMm32L6x8fGfA', ar: 'شارع حلواني أبو حازم', en: 'Halawani Abu Hazem' },
+    zagazig: { phone: '01060229766', map: 'https://maps.app.goo.gl/aPj8CDZfkXg4ccoh9', ar: 'أعلى الطاهر للبصريات', en: 'El-Taher Optics' },
+    'kafr-negm': { phone: '01554368176', map: 'https://maps.app.goo.gl/Yc9nDgCHDhaYWL8F8', ar: 'أمام صيدلية دكتور عبدالحميد دسوقي', en: 'Abdelhamid Desouky Pharmacy' },
+  };
+  const socials = ['https://www.facebook.com/share/1FwUJnTprm/', 'https://www.facebook.com/share/1A7BnaVqwj/', 'https://www.instagram.com/floridadentalclinics', 'https://www.instagram.com/dr.mahmoudabdelbadea', 'https://www.tiktok.com/@floridadentalclinics'];
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const hrefs = () => page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')));
+  const ld = () => page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.parse(s.textContent)));
+
+  for (const lang of ['ar', 'en']) {
+    const pre = lang === 'ar' ? '' : '/en';
+    const hoursText = lang === 'ar' ? 'من 2 ظهرًا حتى 10 مساءً' : '2:00 PM to 10:00 PM';
+    const closedText = lang === 'ar' ? 'الجمعة: مغلق' : 'Friday: Closed';
+
+    // Home
+    await page.goto(base + pre + '/', { waitUntil: 'networkidle' });
+    let body = await page.textContent('body');
+    let links = await hrefs();
+    ok(`${lang} home: floating WhatsApp = official booking link`, (await page.getAttribute('.wa-float', 'href'))?.startsWith(WA + '?text='));
+    ok(`${lang} home: hero WhatsApp CTA = official booking link`, (await page.getAttribute('.hero__cta a[href*="wa.me"]', 'href'))?.startsWith(WA));
+    ok(`${lang} home: tagline in hero`, (await page.textContent('.hero__tagline'))?.trim() === (lang === 'ar' ? 'عيادات فلوريدا لطب وتقويم الأسنان جنبك في كل مكان' : 'Florida Dental Clinics, by your side wherever you are'));
+    ok(`${lang} home: working hours shown`, body.includes(hoursText));
+    ok(`${lang} home: all 5 social links in footer`, socials.every((u) => links.includes(u)), JSON.stringify(socials.filter((u) => !links.includes(u))));
+    ok(`${lang} home: social links open safely in new tab`, await page.evaluate(() => [...document.querySelectorAll('a[href*="facebook.com"],a[href*="instagram.com"],a[href*="tiktok.com"]')].every((a) => a.target === '_blank' && a.rel.includes('noopener'))));
+    ok(`${lang} home: two Instagram accounts labelled differently`, await page.evaluate(() => { const l = [...document.querySelectorAll('.site-footer a[href*="instagram.com"]')].map((a) => a.textContent.trim()); return l.length === 2 && l[0] !== l[1]; }));
+    ok(`${lang} home: only the official WhatsApp number is used`, links.filter((l) => l.includes('wa.me')).every((l) => l.startsWith(WA)));
+    ok(`${lang} home: no placeholders left for address/phone/hours`, (await page.$$('.branch-card .ph')).length === 0);
+    for (const [slug, o] of Object.entries(official)) ok(`${lang} home: ${slug} tel link`, links.includes('tel:+2' + o.phone));
+    if (lang === 'ar') ok('ar: Arabic brand name updated', body.includes('عيادات فلوريدا لطب وتقويم الأسنان') && !body.includes('عيادات فلوريدا لطب الأسنان'));
+
+    // Branch pages
+    for (const [slug, o] of Object.entries(official)) {
+      await page.goto(`${base}${pre}/branches/${slug}/`, { waitUntil: 'networkidle' });
+      body = await page.textContent('main');
+      links = await hrefs();
+      ok(`${lang} ${slug}: official address shown`, body.includes(o[lang]) && body.includes(o.ar), o[lang]);
+      ok(`${lang} ${slug}: phone visible and clickable`, body.includes(o.phone) && (await page.$(`main a[href="tel:+2${o.phone}"]`)) !== null);
+      ok(`${lang} ${slug}: Google Maps buttons use official link`, (await page.$$(`main a[href="${o.map}"]`)).length >= 2);
+      ok(`${lang} ${slug}: hours shown (open + Friday closed)`, body.includes(hoursText) && body.includes(closedText));
+      ok(`${lang} ${slug}: booking WhatsApp = official link`, links.filter((l) => l.includes('wa.me')).length > 0 && links.filter((l) => l.includes('wa.me')).every((l) => l.startsWith(WA)));
+      ok(`${lang} ${slug}: no placeholders`, (await page.$$('main .ph')).length === 0);
+      const dentist = (await ld()).find((x) => x['@type'] === 'Dentist');
+      ok(`${lang} ${slug}: schema telephone`, dentist?.telephone === '+2' + o.phone, dentist?.telephone);
+      ok(`${lang} ${slug}: schema street address`, dentist?.address?.streetAddress?.includes(o[lang]) && dentist?.address?.addressCountry === 'EG');
+      ok(`${lang} ${slug}: schema map`, dentist?.hasMap === o.map);
+      const oh = dentist?.openingHoursSpecification?.[0];
+      ok(`${lang} ${slug}: schema hours Sat-Thu 14:00-22:00, no Friday`, oh?.opens === '14:00' && oh?.closes === '22:00' && oh?.dayOfWeek?.length === 6 && !oh.dayOfWeek.includes('Friday'));
+      const desc = await page.getAttribute('meta[name=description]', 'content');
+      ok(`${lang} ${slug}: meta description has phone`, desc.includes(o.phone), desc);
+    }
+
+    // Contact page
+    await page.goto(base + pre + '/contact/', { waitUntil: 'networkidle' });
+    body = await page.textContent('main');
+    links = await hrefs();
+    ok(`${lang} contact: hours shown`, body.includes(hoursText) && body.includes(closedText));
+    ok(`${lang} contact: no placeholders`, (await page.$$('main .ph')).length === 0);
+    for (const [slug, o] of Object.entries(official)) {
+      ok(`${lang} contact: ${slug} phone + map`, links.includes('tel:+2' + o.phone) && links.includes(o.map));
+    }
+    ok(`${lang} contact: form sends to official WhatsApp`, await page.evaluate(() => { const c = JSON.parse(document.querySelector('[data-booking-config]').textContent); return c.mode === 'whatsapp' && Object.values(c.targets).every((v) => v === '201554368176'); }));
+    const org = (await ld()).find((x) => x['@type'] === 'Organization');
+    ok(`${lang} contact: organization sameAs has all social links`, socials.every((u) => org?.sameAs?.includes(u)));
+  }
+  // Real hand-off goes to the official number with the chosen branch named
+  await page.goto(base + '/contact/?branch=zagazig');
+  await page.evaluate(() => { window.__opened = []; window.open = (u) => { window.__opened.push(u); return null; }; });
+  await page.fill('#bk-name', 'Test User'); await page.fill('#bk-phone', '01000000000');
+  await page.selectOption('#bk-service', 'orthodontics'); await page.check('#bk-consent');
+  await page.click('[data-submit]');
+  const sent = (await page.evaluate(() => window.__opened))[0] || '';
+  ok('booking request opens official WhatsApp with branch name', sent.startsWith(WA + '?text=') && decodeURIComponent(sent).includes('فرع الزقازيق'), sent);
+  ok('official build: no console errors', errors.length === 0, errors.join(' | '));
+  await ctx.close();
   srv.close();
 }
 

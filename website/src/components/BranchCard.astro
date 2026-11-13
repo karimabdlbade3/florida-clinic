@@ -1,7 +1,7 @@
 ---
 import type { Branch, Lang } from '../data/branches';
 import { t } from '../i18n/ui';
-import { localize, routes } from '../lib/urls';
+import { localize, routes, telLink } from '../lib/urls';
 import Icon from './Icon.astro';
 interface Props { lang: Lang; branch: Branch; delay?: number }
 const { lang, branch: b, delay = 0 } = Astro.props;
@@ -16,7 +16,8 @@ const d = t(lang);
   <p class="branch-card__loc">{b.locality[lang]}{lang === 'ar' ? '، ' : ', '}{b.region[lang]}</p>
   <ul class="branch-card__meta">
     <li><Icon name="pin" />{b.address ? b.address[lang] : <span class="ph">{d.placeholder.address}</span>}</li>
-    <li><Icon name="clock" />{b.hours ? b.hours[lang][0] : <span class="ph">{d.placeholder.hours}</span>}</li>
+    <li><Icon name="clock" />{b.hours ? <span>{b.hours[lang].join(lang === 'ar' ? '، ' : ' · ')}</span> : <span class="ph">{d.placeholder.hours}</span>}</li>
+    <li><Icon name="phone" />{b.phone ? <a class="branch-card__tel" href={telLink(b.phone)} dir="ltr" data-track="call_click">{b.phone}</a> : <span class="ph">{d.placeholder.phone}</span>}</li>
   </ul>
   <span class="link-arrow" aria-hidden="true">{d.cta.viewBranch} <Icon name="arrow" class="flip" /></span>
 </article>
@@ -26,5 +27,6 @@ const d = t(lang);
   .branch-card__loc { margin-bottom: 18px; }
   .branch-card__meta { list-style: none; display: grid; gap: 10px; margin-bottom: 24px; font-size: .95rem; color: var(--ink-2); }
   .branch-card__meta li { display: flex; gap: 10px; align-items: flex-start; }
+  .branch-card__tel { position: relative; z-index: 1; font-weight: 500; }
   .branch-card__meta :global(svg) { width: 18px; height: 18px; margin-top: .35em; color: var(--gold-600); flex: none; }
 </style>

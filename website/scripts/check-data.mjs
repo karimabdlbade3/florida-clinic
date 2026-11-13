@@ -14,16 +14,22 @@ const missing = [];
 const branches = read('src/data/branches.ts');
 for (const block of branches.split(/\n  \{\n    slug: /).slice(1)) {
   const slug = block.match(/^'([^']+)'/)[1];
-  for (const f of ['address', 'phone', 'whatsapp', 'hours', 'mapEmbedUrl', 'mapLink']) {
+  for (const f of ['address', 'phone', 'hours', 'mapLink']) {
     if (new RegExp(`\\n    ${f}: null,`).test(block)) missing.push(`Branch "${slug}": ${f}`);
   }
+  if (/\n    mapEmbedUrl: null,/.test(block)) missing.push(`Branch "${slug}": mapEmbedUrl (Google Maps > Share > Embed a map; the page shows an "Open in Google Maps" button until then)`);
+  if (/\n    whatsapp: null,/.test(block)) missing.push(`Branch "${slug}": own WhatsApp number (optional: central booking WhatsApp is used)`);
 }
 // Site contact / social
 const site = read('src/config/site.ts');
-if (!env.PUBLIC_WHATSAPP_NUMBER && /toIntlEgypt\(null/.test(site)) missing.push('Main WhatsApp number (PUBLIC_WHATSAPP_NUMBER or site.ts)');
-for (const f of ['phone', 'email', 'facebook', 'instagram', 'tiktok', 'googleReviews']) if (new RegExp(`\\b${f}: null`).test(site)) missing.push(`site.ts: ${f}`);
+if (!/OFFICIAL_BOOKING_WHATSAPP = '20\d{10}'/.test(site) && !env.PUBLIC_WHATSAPP_NUMBER) missing.push('Booking WhatsApp number');
+if (/\bphone: null/.test(site)) missing.push('General hotline number (optional: branch phones are shown)');
+if (/\bemail: null/.test(site)) missing.push('Official email address (optional)');
+if (/googleReviews: null/.test(site)) missing.push('Google Business Profile review link (for the "Share your experience" button)');
+if (/additional page/.test(site)) missing.push('Confirm what the second Facebook link is (labelled "additional page" for now)');
 if (!env.SITE_URL && !process.env.SITE_URL) missing.push('SITE_URL (final domain)');
 for (const k of ['PUBLIC_GA_ID', 'PUBLIC_META_PIXEL_ID', 'PUBLIC_GSC_VERIFICATION']) if (!env[k] && !process.env[k]) missing.push(`${k} (optional)`);
+missing.push('Confirm English transliteration of street/shop names in branch addresses');
 // Content
 if (/testimonials: Testimonial\[\] = \[\];/.test(read('src/data/testimonials.ts'))) missing.push('Testimonials (real, with written consent)');
 const photos = existsSync(resolve(root, 'src/assets/photos')) ? readdirSync(resolve(root, 'src/assets/photos')).filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f)) : [];
