@@ -62,7 +62,7 @@ const browser = await chromium.launch();
   const base = 'http://localhost:4401';
   const pages = pagesOf(dir);
   console.log(`A) ${pages.length} pages, WhatsApp switched off`);
-  ok('page count (2 langs x 15)', pages.length === 30, String(pages.length));
+  ok('page count (2 langs x 17)', pages.length === 34, String(pages.length));
   const ctx = await browser.newContext();
   const linkSet = new Set();
   for (const path of pages) {
@@ -119,7 +119,7 @@ const browser = await chromium.launch();
     ok(`${f} exists`, (await fetch(base + f)).status === 200);
   }
   const sm = await (await fetch(base + '/sitemap-0.xml')).text();
-  ok('sitemap has 30 URLs', (sm.match(/<loc>/g) || []).length === 30, String((sm.match(/<loc>/g) || []).length));
+  ok('sitemap has 34 URLs', (sm.match(/<loc>/g) || []).length === 34, String((sm.match(/<loc>/g) || []).length));
   ok('sitemap excludes 404', !sm.includes('404'));
   // language switch
   const p = await ctx.newPage();
@@ -317,6 +317,66 @@ const browser = await chromium.launch();
     const org = (await ld()).find((x) => x['@type'] === 'Organization');
     ok(`${lang} contact: organization sameAs has all social links`, socials.every((u) => org?.sameAs?.includes(u)));
   }
+  // Services: the seven official categories, in the official order, plus secondary care
+  {
+    const MAIN = ['orthodontics', 'dental-implants', 'cosmetic-dentistry', 'dental-fillings', 'root-canal-treatment', 'pediatric-dentistry', 'tooth-extraction'];
+    const NAMES = {
+      ar: ['تقويم الأسنان', 'زراعة الأسنان', 'تجميل الأسنان', 'حشو الأسنان', 'علاج الجذور', 'طب أسنان الأطفال', 'خلع الأسنان'],
+      en: ['Orthodontics', 'Dental Implants', 'Cosmetic Dentistry', 'Dental Fillings', 'Root Canal Treatment', 'Pediatric Dentistry', 'Tooth Extraction'],
+    };
+    const slugOf = (h) => (h || '').match(/services\/([a-z-]+)\//)?.[1];
+    for (const lang of ['ar', 'en']) {
+      const pre = lang === 'ar' ? '' : '/en';
+      for (const path of ['/', '/services/']) {
+        await page.goto(base + pre + path, { waitUntil: 'networkidle' });
+        const cards = await page.$$eval('[data-main-services] .svc-card', (els) => els.map((e) => ({ num: e.querySelector('.svc-card__num')?.textContent.trim(), name: e.querySelector('h3').textContent.trim(), href: e.querySelector('a').getAttribute('href'), text: e.querySelector('p').textContent.trim().length })));
+        ok(`${lang} ${path}: exactly seven main service cards in official order`, JSON.stringify(cards.map((c) => slugOf(c.href))) === JSON.stringify(MAIN), JSON.stringify(cards.map((c) => c.href)));
+        ok(`${lang} ${path}: cards numbered 01-07 with official names`, cards.every((c, i) => c.num === String(i + 1).padStart(2, '0') && c.name === NAMES[lang][i] && c.text > 40), JSON.stringify(cards.map((c) => c.num + ' ' + c.name)));
+        await page.evaluate(async () => { for (const i of document.querySelectorAll('.svc-card img')) { i.loading = 'eager'; if (!i.complete) await new Promise((r) => { i.onload = i.onerror = r; }); } });
+        ok(`${lang} ${path}: every main card has a loaded photo with empty alt`, await page.$$eval('[data-main-services] .svc-card', (els) => els.every((e) => { const i = e.querySelector('img'); return i && i.naturalWidth > 0 && i.getAttribute('alt') === ''; })));
+      }
+      ok(`${lang} services: secondary care listed separately`, JSON.stringify(await page.$$eval('[data-secondary-services] .svc-card a', (a) => a.map((x) => x.getAttribute('href').match(/services\/([a-z-]+)\//)[1]))) === '["general-dentistry"]');
+      ok(`${lang} nav: services menu lists the seven then secondary`, JSON.stringify((await page.$eval('#site-nav .has-sub', (li) => [...li.querySelectorAll('.sub a')].map((x) => x.getAttribute('href')))).map(slugOf).filter(Boolean)) === JSON.stringify([...MAIN, 'general-dentistry']));
+      await page.goto(base + pre + '/contact/');
+      ok(`${lang} form: service options = seven + general care + unsure`, JSON.stringify(await page.$$eval('#bk-service option', (o) => o.map((x) => x.value).filter(Boolean))) === JSON.stringify([...MAIN, 'general-dentistry', 'unsure']));
+      for (const slug of [...MAIN, 'general-dentistry']) {
+        const r = await page.goto(`${base}${pre}/services/${slug}/`);
+        ok(`${lang} service page ${slug} loads with booking link`, r.status() === 200 && (await page.$(`a[href*="service=${slug}"]`)) !== null);
+      }
+    }
+    // Existing content preserved, not deleted
+    await page.goto(base + '/services/general-dentistry/');
+    let txt = await page.textContent('main');
+    ok('secondary care keeps check-ups, scaling, crowns/bridges, dentures', ['الكشف الدوري', 'تنظيف الجير وتلميع الأسنان', 'التيجان والجسور', 'التركيبات المتحركة'].every((x) => txt.includes(x)));
+    await page.goto(base + '/services/tooth-extraction/');
+    txt = await page.textContent('main');
+    ok('tooth extraction keeps surgical, wisdom-tooth and minor oral surgery content', ['الخلع العادي', 'الخلع الجراحي', 'خلع ضرس العقل', 'الإجراءات الجراحية البسيطة في الفم'].every((x) => txt.includes(x)));
+    await page.goto(base + '/services/cosmetic-dentistry/');
+    txt = await page.textContent('main');
+    ok('cosmetic dentistry keeps veneers, whitening and aesthetic crowns', ['الفينير', 'تبييض الأسنان', 'التيجان التجميلية'].every((x) => txt.includes(x)));
+    ok('old oral-surgery URL no longer exists', (await fetch(base + '/services/oral-surgery/')).status === 404);
+    // Home: booking form + floating call menu
+    const mob = await browser.newContext(devices['iPhone 13']);
+    const mp = await mob.newPage();
+    await mp.goto(base + '/');
+    ok('home: sections in planned order', await mp.evaluate(() => { const ids = ['about-title', 'services-title', 'why-title', 'branches-title', 'exp-title', 'booking-title'].map((i) => document.getElementById(i)?.getBoundingClientRect().top); return ids.every((v, i) => v !== undefined && (i === 0 || v > ids[i - 1])); }));
+    ok('home: dark sections for services and booking, light page elsewhere', await mp.evaluate(() => { const bg = (s) => getComputedStyle(document.querySelector(s)).backgroundColor; return bg('#services-title') !== undefined && bg('section[aria-labelledby="services-title"]') === 'rgb(20, 18, 14)' && bg('#booking') === 'rgb(20, 18, 14)' && bg('body') === 'rgb(255, 255, 255)'; }));
+    await mp.click('[data-call-toggle]');
+    ok('mobile: call button opens the three branch numbers as tel links', JSON.stringify(await mp.$$eval('[data-call-menu]:not([hidden]) a', (a) => a.map((x) => x.getAttribute('href')))) === JSON.stringify(['tel:+201554368176', 'tel:+201148770555', 'tel:+201060229766']));
+    await mp.keyboard.press('Escape');
+    ok('mobile: call menu closes', await mp.$eval('[data-call-menu]', (e) => e.hidden));
+    await mp.click('[data-nav-toggle]'); await mp.waitForTimeout(350);
+    await mp.locator('#site-nav .has-sub [data-sub-toggle]').first().click();
+    ok('mobile: services sub-menu opens inside the menu', await mp.isVisible('#site-nav a[href="/services/root-canal-treatment/"]'));
+    await mp.goto(base + '/');
+    await mp.evaluate(() => { window.__opened = []; window.open = (u) => { window.__opened.push(u); return null; }; });
+    await mp.fill('#bk-name', 'Test User'); await mp.fill('#bk-phone', '01000000000');
+    await mp.selectOption('#bk-branch', 'ibrahimia'); await mp.selectOption('#bk-service', 'root-canal-treatment'); await mp.check('#bk-consent');
+    await mp.click('[data-submit]');
+    const sentHome = (await mp.evaluate(() => window.__opened))[0] || '';
+    ok('home: appointment form hands off to official WhatsApp', sentHome.startsWith(WA + '?text=') && decodeURIComponent(sentHome).includes('علاج الجذور') && decodeURIComponent(sentHome).includes('فرع الإبراهيمية'), sentHome.slice(0, 80));
+    await mob.close();
+  }
   // Branch history: chronological order and opening years, in both languages
   {
     const ORDER = ['kafr-negm', 'ibrahimia', 'zagazig'];
@@ -383,7 +443,7 @@ const browser = await chromium.launch();
       shown += r.shown;
       ok(`${path} every displayed phone number is a tappable tel: link`, r.bad.length === 0, JSON.stringify(r.bad));
     }
-    ok('phone numbers are displayed across the site', shown >= 30 * 3, String(shown));
+    ok('phone numbers are displayed across the site', shown >= 34 * 3, String(shown));
     await mob.close();
   }
   // No unfinished placeholders anywhere in the production build, no layout overflow

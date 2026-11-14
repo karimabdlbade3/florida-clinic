@@ -1,17 +1,19 @@
 ---
 import type { Lang } from '../data/branches';
 import { branches } from '../data/branches';
-import { services } from '../data/services';
+import { mainServices, secondaryServices } from '../data/services';
 import { media } from '../data/media';
 import { site } from '../config/site';
 import { t } from '../i18n/ui';
-import { localize, routes, whatsappLink } from '../lib/urls';
+import { localize, routes, whatsappLink, telLink } from '../lib/urls';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PhotoSlot from '../components/PhotoSlot.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import BranchCard from '../components/BranchCard.astro';
 import Testimonials from '../components/Testimonials.astro';
-import CtaBand from '../components/CtaBand.astro';
+import BookingForm from '../components/BookingForm.astro';
+import TeamSection from '../components/TeamSection.astro';
+import Gallery from '../components/Gallery.astro';
 import Icon from '../components/Icon.astro';
 
 interface Props { lang: Lang }
@@ -57,31 +59,46 @@ const schema = [{
     </div>
   </section>
 
-  <!-- About intro -->
-  <section class="section">
+  <!-- About + history -->
+  <section class="section" aria-labelledby="about-title">
     <div class="container about-intro">
       <div class="reveal">
         <PhotoSlot src={media.homeAbout ?? undefined} alt={d.placeholder.photo} ratio="5 / 4" motif="chair" />
       </div>
       <div class="reveal" data-delay="1">
         <p class="eyebrow">{h.aboutEyebrow}</p>
-        <h2>{h.aboutTitle}</h2>
+        <h2 id="about-title" class="title-mark">{h.aboutTitle}</h2>
         <p class="lead">{h.aboutText}</p>
+        <ol class="history" aria-label={h.historyTitle}>
+          {branches.map((b) => (
+            <li>
+              <span class="history__year">{b.opened}</span>
+              <a href={localize(routes.branch(b.slug), lang)}>{b.name[lang]}</a>
+              {b.isMain && <span class="tag">{d.branches.main}</span>}
+            </li>
+          ))}
+        </ol>
         <a class="link-arrow" href={localize(routes.about, lang)}>{h.aboutLink} <Icon name="arrow" class="flip" /></a>
       </div>
     </div>
   </section>
 
-  <!-- Services -->
-  <section class="section section--ivory" aria-labelledby="services-title">
+  <!-- Services: seven numbered cards -->
+  <section class="section section--dark" aria-labelledby="services-title">
     <div class="container">
       <div class="section-head reveal">
         <p class="eyebrow">{h.servicesEyebrow}</p>
         <h2 id="services-title">{h.servicesTitle}</h2>
         <p>{h.servicesLead}</p>
       </div>
-      <div class="grid grid--3">
-        {services.map((s, i) => <ServiceCard lang={lang} service={s} delay={i % 3} />)}
+      <div class="svc-grid" data-main-services>
+        {mainServices.map((s, i) => <ServiceCard lang={lang} service={s} number={i + 1} delay={i % 4} />)}
+      </div>
+      <div class="svc-more reveal">
+        <ul>
+          {secondaryServices.map((s) => <li><a href={localize(routes.service(s.slug), lang)}><Icon name={s.icon} />{s.name[lang]}</a></li>)}
+        </ul>
+        <a class="btn" href={localize(routes.services, lang)}>{d.cta.allServices}</a>
       </div>
     </div>
   </section>
@@ -91,7 +108,7 @@ const schema = [{
     <div class="container why">
       <div class="why__head reveal">
         <p class="eyebrow">{h.whyEyebrow}</p>
-        <h2 id="why-title">{h.whyTitle}</h2>
+        <h2 id="why-title" class="title-mark">{h.whyTitle}</h2>
         <a class="btn btn--outline" href={localize(routes.about, lang)}>{h.aboutLink}</a>
       </div>
       <ol class="why__list">
@@ -105,6 +122,8 @@ const schema = [{
       </ol>
     </div>
   </section>
+
+  <TeamSection lang={lang} />
 
   <!-- Branches -->
   <section class="section section--sand" aria-labelledby="branches-title">
@@ -123,7 +142,7 @@ const schema = [{
           <h3>{d.branches.hours}</h3>
           <p>{site.hours.sentence[lang]}</p>
         </div>
-        <a class="btn btn--outline" href={localize(routes.contact, lang) + '#booking'} data-track="book_click">{d.cta.book}</a>
+        <a class="btn btn--outline" href="#booking" data-track="book_click">{d.cta.book}</a>
       </div>
     </div>
   </section>
@@ -147,8 +166,30 @@ const schema = [{
     </div>
   </section>
 
+  <Gallery lang={lang} />
   <Testimonials lang={lang} />
-  <CtaBand lang={lang} />
+
+  <!-- Contact + appointment request -->
+  <section class="section section--dark home-booking" id="booking" aria-labelledby="booking-title">
+    <div class="container home-booking__grid">
+      <div class="reveal">
+        <p class="eyebrow">{h.bookingEyebrow}</p>
+        <h2 id="booking-title" class="title-mark">{h.bookingTitle}</h2>
+        <p class="lead">{h.bookingText}</p>
+        {wa && <a class="btn" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>}
+        <ul class="home-booking__phones">
+          {branches.map((b) => b.phone && (
+            <li><span>{b.name[lang]}</span><a href={telLink(b.phone)} dir="ltr" data-track="call_click">{b.phone}</a></li>
+          ))}
+        </ul>
+        <p class="home-booking__hours"><Icon name="clock" />{site.hours.lines[lang].join(lang === 'ar' ? '، ' : ' · ')}</p>
+      </div>
+      <div class="booking-card reveal" data-delay="1">
+        <h3>{d.contact.formTitle}</h3>
+        <BookingForm lang={lang} />
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
@@ -177,6 +218,25 @@ const schema = [{
   .hero__badge-icon :global(svg) { width: 20px; height: 20px; }
   @media (max-width: 520px) { .hero__badge { inset-inline-start: 8px; bottom: 18px; font-size: .88rem; } }
 
+  .history { list-style: none; display: grid; gap: 0; margin: 4px 0 24px; border-top: 1px solid var(--line); }
+  .history li { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .history__year { min-width: 3.2ch; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.6rem; font-weight: 600; line-height: 1; color: var(--gold-700); }
+  .history a { font-weight: 500; text-decoration: none; }
+  .svc-more { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: 28px; }
+  .svc-more ul { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
+  .svc-more li a { display: inline-flex; align-items: center; gap: 10px; padding: 11px 18px; border: 1px solid rgba(198, 151, 65, .45); border-radius: 999px; color: #e6ddcd; text-decoration: none; }
+  .svc-more li :global(svg) { width: 18px; height: 18px; color: var(--gold-300); }
+  .home-booking { scroll-margin-top: 70px; }
+  .home-booking__grid { display: grid; gap: 40px; align-items: start; }
+  @media (min-width: 1000px) { .home-booking__grid { grid-template-columns: .8fr 1.2fr; gap: 64px; } }
+  .home-booking__phones { list-style: none; display: grid; margin: 28px 0 18px; border-top: 1px solid rgba(255, 255, 255, .14); }
+  .home-booking__phones li { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid rgba(255, 255, 255, .14); }
+  .home-booking__phones a { color: var(--gold-300); font-weight: 600; text-decoration: none; }
+  .home-booking__hours { display: flex; gap: 10px; align-items: flex-start; margin: 0; font-size: .95rem; }
+  .home-booking__hours :global(svg) { width: 20px; height: 20px; margin-top: .3em; color: var(--gold-300); flex: none; }
+  .booking-card { background: var(--white); color: var(--ink); border-radius: var(--radius-lg); padding: clamp(22px, 3vw, 36px); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .7); }
+  .booking-card h3 { color: var(--ink); margin-bottom: 18px; }
+  .booking-card :global(a:not(.btn):hover) { color: var(--gold-700); }
   .about-intro { display: grid; gap: clamp(32px, 5vw, 72px); align-items: center; }
   @media (min-width: 900px) { .about-intro { grid-template-columns: 1fr 1fr; } }
 

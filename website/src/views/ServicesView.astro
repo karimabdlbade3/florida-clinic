@@ -1,6 +1,6 @@
 ---
 import type { Lang } from '../data/branches';
-import { services } from '../data/services';
+import { services, mainServices, secondaryServices } from '../data/services';
 import { t } from '../i18n/ui';
 import { localize, routes } from '../lib/urls';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -24,13 +24,27 @@ const schema = [{
 ---
 <BaseLayout lang={lang} title={d.seo.servicesTitle} description={d.seo.servicesDesc} schema={schema}>
   <PageHero lang={lang} title={d.services.title} lead={d.services.lead} crumbs={[{ label: d.services.title }]} />
-  <section class="section">
+  <section class="section section--dark" aria-labelledby="main-services">
     <div class="container">
-      <div class="grid grid--3">
-        {services.map((s, i) => <ServiceCard lang={lang} service={s} delay={i % 3} />)}
+      <h2 id="main-services" class="sr-only">{d.services.title}</h2>
+      <div class="svc-grid" data-main-services>
+        {mainServices.map((s, i) => <ServiceCard lang={lang} service={s} number={i + 1} delay={i % 4} />)}
       </div>
-      <p class="muted" style="margin-top:40px;font-size:.92rem">{d.services.note}</p>
     </div>
   </section>
+  {secondaryServices.length > 0 && (
+    <section class="section" aria-labelledby="secondary-services">
+      <div class="container">
+        <div class="section-head reveal">
+          <h2 id="secondary-services">{d.services.secondaryTitle}</h2>
+          <p>{d.services.secondaryLead}</p>
+        </div>
+        <div class="svc-grid svc-grid--few" data-secondary-services>
+          {secondaryServices.map((s, i) => <ServiceCard lang={lang} service={s} delay={i} />)}
+        </div>
+        <p class="muted" style="margin-top:40px;font-size:.92rem">{d.services.note}</p>
+      </div>
+    </section>
+  )}
   <CtaBand lang={lang} title={d.services.ctaTitle} text={d.services.ctaText} />
 </BaseLayout>

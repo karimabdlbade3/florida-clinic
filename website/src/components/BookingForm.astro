@@ -136,7 +136,7 @@ const submitLabel = mode === 'whatsapp' ? f.submitWhatsapp : f.submit;
   .booking { position: relative; display: grid; gap: 22px; }
   .booking__note { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 14px 16px; border-radius: 12px; background: var(--ivory); border: 1px solid var(--gold-200); color: var(--ink-2); font-size: .95rem; }
   .booking__note :global(svg) { width: 20px; height: 20px; margin-top: .3em; color: var(--gold-600); flex: none; }
-  .booking__grid { display: grid; gap: 18px; }
+  .booking__grid { display: grid; gap: 18px; align-items: start; }
   @media (min-width: 640px) { .booking__grid { grid-template-columns: 1fr 1fr; } .booking__full { grid-column: 1 / -1; } }
   .booking__submit { min-height: 56px; font-size: 1.05rem; }
 </style>

@@ -1,0 +1,36 @@
+---
+/**
+ * Photo gallery. Renders nothing until real, approved clinic photos are added
+ * to `media.gallery` in src/data/media.ts. Before/after photos must only be
+ * added with the patient's written consent.
+ */
+import { Picture } from 'astro:assets';
+import type { Lang } from '../data/branches';
+import { media } from '../data/media';
+import { t } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+{media.gallery.length > 0 && (
+  <section class="section section--ivory" aria-labelledby="gallery-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">{d.home.galleryEyebrow}</p>
+        <h2 id="gallery-title">{d.home.galleryTitle}</h2>
+      </div>
+      <ul class="gallery">
+        {media.gallery.map((g) => (
+          <li class="reveal"><Picture src={g.src} alt={g.alt[lang]} formats={['avif', 'webp']} widths={[480, 900]} sizes="(min-width: 900px) 33vw, 50vw" loading="lazy" /></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .gallery { list-style: none; display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 900px) { .gallery { grid-template-columns: repeat(3, 1fr); } }
+  .gallery li { overflow: hidden; border-radius: var(--radius); aspect-ratio: 4 / 3; background: var(--sand); }
+  .gallery :global(img) { width: 100%; height: 100%; object-fit: cover; }
+</style>

@@ -18,6 +18,27 @@ if (toggle && nav) {
   window.matchMedia('(min-width: 921px)').addEventListener('change', (m) => { if (m.matches) setOpen(false); });
 }
 
+// ---- Sub-menus (services, branches): tap to open on touch / small screens ----
+document.querySelectorAll<HTMLButtonElement>('[data-sub-toggle]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const li = btn.closest('li')!;
+    const open = !li.classList.contains('is-open');
+    document.querySelectorAll('.has-sub.is-open').forEach((x) => { if (x !== li) { x.classList.remove('is-open'); x.querySelector('[data-sub-toggle]')?.setAttribute('aria-expanded', 'false'); } });
+    li.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', String(open));
+  });
+});
+
+// ---- Floating call menu ----
+const callBtn = document.querySelector<HTMLButtonElement>('[data-call-toggle]');
+const callMenu = document.querySelector<HTMLElement>('[data-call-menu]');
+if (callBtn && callMenu) {
+  const setCall = (open: boolean) => { callMenu.hidden = !open; callBtn.setAttribute('aria-expanded', String(open)); };
+  callBtn.addEventListener('click', () => setCall(callMenu.hidden));
+  document.addEventListener('click', (e) => { if (!(e.target as Element).closest('[data-call-wrap]')) setCall(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setCall(false); });
+}
+
 // ---- Header shadow on scroll ----
 const header = document.querySelector<HTMLElement>('[data-header]');
 if (header) {

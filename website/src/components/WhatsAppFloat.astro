@@ -1,24 +1,62 @@
 ---
-/** Floating WhatsApp button. Renders nothing until a real number is configured. */
+/**
+ * Floating contact actions: WhatsApp booking (official number) and a call
+ * button that lists the three branch phone numbers as tel: links.
+ * Each part renders only when real data exists.
+ */
 import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
 import { t } from '../i18n/ui';
-import { whatsappLink } from '../lib/urls';
+import { whatsappLink, telLink } from '../lib/urls';
 import Icon from './Icon.astro';
 interface Props { lang: Lang; message?: string }
 const { lang, message } = Astro.props;
 const d = t(lang);
 const href = whatsappLink(message ?? d.whatsappDefault);
+const phones = branches.filter((b) => b.phone);
 ---
-{href && (
-  <a class="wa-float" href={href} target="_blank" rel="noopener" aria-label={d.whatsappFloat} data-track="whatsapp_click">
-    <Icon name="whatsapp" />
-    <span class="wa-float__label">{d.cta.whatsapp}</span>
-  </a>
-)}
+<div class="float-actions">
+  {phones.length > 0 && (
+    <div class="call-float" data-call-wrap>
+      <div class="call-float__menu" id="call-menu" data-call-menu hidden>
+        <p>{d.home.callTitle}</p>
+        <ul>
+          {phones.map((b) => (
+            <li><a href={telLink(b.phone)} data-track="call_click"><span>{b.name[lang]}</span><span dir="ltr">{b.phone}</span></a></li>
+          ))}
+        </ul>
+      </div>
+      <button class="call-float__btn" type="button" aria-expanded="false" aria-controls="call-menu" aria-label={d.home.callTitle} data-call-toggle>
+        <Icon name="phone" />
+      </button>
+    </div>
+  )}
+  {href && (
+    <a class="wa-float" href={href} target="_blank" rel="noopener" aria-label={d.whatsappFloat} data-track="whatsapp_click">
+      <Icon name="whatsapp" />
+      <span class="wa-float__label">{d.cta.whatsapp}</span>
+    </a>
+  )}
+</div>
 
 <style>
-  .wa-float { position: fixed; z-index: 40; inset-inline-end: 18px; bottom: 18px; display: inline-flex; align-items: center; gap: 10px; height: 58px; padding: 0 20px 0 18px; border-radius: 999px; background: #1f7a4d; color: #fff; text-decoration: none; font-weight: 500; box-shadow: 0 12px 30px -10px rgba(16, 70, 43, .55); transition: transform .25s var(--ease), background .25s; }
+  .float-actions { position: fixed; z-index: 40; inset-inline-end: 18px; bottom: 18px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; pointer-events: none; }
+  .float-actions > * { pointer-events: auto; }
+  .wa-float { display: inline-flex; align-items: center; gap: 10px; height: 58px; padding: 0 20px 0 18px; border-radius: 999px; background: #1f7a4d; color: #fff; text-decoration: none; font-weight: 500; box-shadow: 0 12px 30px -10px rgba(16, 70, 43, .55); transition: transform .25s var(--ease), background .25s; }
   .wa-float:hover { background: #186640; color: #fff; transform: translateY(-2px); }
   .wa-float :global(svg) { width: 26px; height: 26px; }
-  @media (max-width: 720px) { .wa-float { width: 58px; padding: 0; justify-content: center; bottom: calc(14px + env(safe-area-inset-bottom)); inset-inline-end: 14px; } .wa-float__label { display: none; } }
+  .call-float { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .call-float__btn { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; border: 0; background: var(--gold-500); color: var(--ink); cursor: pointer; box-shadow: 0 12px 30px -12px rgba(60, 45, 20, .6); transition: transform .25s var(--ease), background .25s; }
+  .call-float__btn:hover { background: var(--gold-400); transform: translateY(-2px); }
+  .call-float__btn :global(svg) { width: 24px; height: 24px; }
+  .call-float__menu { width: min(300px, calc(100vw - 36px)); padding: 16px; border-radius: 18px; background: var(--white); border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .call-float__menu p { margin: 0 0 8px; font-weight: 600; font-size: .95rem; }
+  .call-float__menu ul { list-style: none; display: grid; }
+  .call-float__menu a { display: flex; justify-content: space-between; gap: 12px; padding: 11px 4px; border-top: 1px solid var(--line); text-decoration: none; font-size: .97rem; }
+  .call-float__menu a span:last-child { font-weight: 600; color: var(--gold-700); }
+  @media (max-width: 720px) {
+    .float-actions { inset-inline-end: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); }
+    .wa-float { width: 58px; padding: 0; justify-content: center; }
+    .wa-float__label { display: none; }
+  }
 </style>

@@ -157,7 +157,7 @@ Organization, Dentist per branch (only verified fields), MedicalWebPage, FAQPage
 
 ## QA status (at handover)
 
-- `npm run test:e2e`: 879/879 checks pass: official business data (phones, maps, hours, WhatsApp, social links,
+- `npm run test:e2e`: all checks pass: official business data (phones, maps, hours, WhatsApp, social links,
   branch schema) in both languages, all 30 pages, no visible placeholders, no broken images, form validation and
   WhatsApp hand-off with every field preserved, endpoint success/failure, 404, sitemap, and no horizontal overflow
   at 320 / 375 / 390 / 768 / 1024 / 1440 px.

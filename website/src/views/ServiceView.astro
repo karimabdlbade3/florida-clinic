@@ -16,7 +16,7 @@ interface Props { lang: Lang; service: Service }
 const { lang, service: s } = Astro.props;
 const d = t(lang);
 const S = d.services;
-const others = services.filter((x) => x.slug !== s.slug).slice(0, 5);
+const others = services.filter((x) => x.slug !== s.slug);
 const bookHref = `${localize(routes.contact, lang)}?service=${s.slug}#booking`;
 const waMsg = `${d.whatsappDefault} ${s.name[lang]}`;
 const pageUrl = new URL(localize(routes.service(s.slug), lang), Astro.site).href;

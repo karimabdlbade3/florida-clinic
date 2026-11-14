@@ -203,3 +203,29 @@ html[lang='en'] .page-hero h1 { max-width: 20ch; }
 @media print {
   .site-header, .site-footer, .wa-float, .cta-band { display: none !important; }
 }
+
+/* ==========================================================================
+   Redesign layer: dark contrast sections, marked section titles
+   ========================================================================== */
+html[lang='ar'] :is(h1, h2) { font-weight: 600; }
+.section-head:not(.section-head--center) h2, .title-mark { position: relative; padding-inline-start: 20px; }
+.section-head:not(.section-head--center) h2::before, .title-mark::before { content: ''; position: absolute; inset-inline-start: 0; top: .18em; bottom: .18em; width: 4px; border-radius: 4px; background: var(--gold-500); }
+
+.section--dark { position: relative; background: #14120e; color: #d9d0c0; overflow: hidden; }
+.section--dark::before { content: ''; position: absolute; inset-inline-end: -180px; top: -220px; width: 560px; height: 560px; border-radius: 50%; border: 1px solid rgba(198, 151, 65, .22); pointer-events: none; }
+.section--dark > .container { position: relative; }
+.section--dark :is(h1, h2, h3) { color: var(--white); }
+.section--dark .eyebrow { color: var(--gold-300); }
+.section--dark .section-head p, .section--dark .lead { color: #c9bfae; }
+.section--dark a:not(.btn):hover { color: var(--gold-300); }
+.section--dark .link-arrow { color: var(--gold-300); }
+.section--dark :focus-visible { outline-color: var(--gold-300); }
+
+/* Numbered service cards (image background, consistent dark treatment) */
+.svc-grid { display: grid; gap: clamp(14px, 2vw, 22px); grid-template-columns: 1fr; }
+@media (min-width: 640px) { .svc-grid { grid-template-columns: repeat(2, 1fr); } }
+/* seven cards: 3 on the first row, 4 on the second */
+@media (min-width: 1024px) { .svc-grid { grid-template-columns: repeat(12, 1fr); } .svc-grid > * { grid-column: span 3; } .svc-grid > :nth-child(-n+3) { grid-column: span 4; } }
+.svc-grid--few { grid-template-columns: 1fr; }
+@media (min-width: 640px) { .svc-grid--few { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .svc-grid--few { grid-template-columns: repeat(3, 1fr); } .svc-grid--few > * { grid-column: auto !important; } }
