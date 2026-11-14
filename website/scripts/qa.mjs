@@ -62,7 +62,7 @@ const browser = await chromium.launch();
   const base = 'http://localhost:4401';
   const pages = pagesOf(dir);
   console.log(`A) ${pages.length} pages, WhatsApp switched off`);
-  ok('page count (2 langs x 17)', pages.length === 34, String(pages.length));
+  ok('page count (2 langs x 18)', pages.length === 36, String(pages.length));
   const ctx = await browser.newContext();
   const linkSet = new Set();
   for (const path of pages) {
@@ -119,7 +119,7 @@ const browser = await chromium.launch();
     ok(`${f} exists`, (await fetch(base + f)).status === 200);
   }
   const sm = await (await fetch(base + '/sitemap-0.xml')).text();
-  ok('sitemap has 34 URLs', (sm.match(/<loc>/g) || []).length === 34, String((sm.match(/<loc>/g) || []).length));
+  ok('sitemap has 36 URLs', (sm.match(/<loc>/g) || []).length === 36, String((sm.match(/<loc>/g) || []).length));
   ok('sitemap excludes 404', !sm.includes('404'));
   // language switch
   const p = await ctx.newPage();
@@ -377,6 +377,63 @@ const browser = await chromium.launch();
     ok('home: appointment form hands off to official WhatsApp', sentHome.startsWith(WA + '?text=') && decodeURIComponent(sentHome).includes('علاج الجذور') && decodeURIComponent(sentHome).includes('فرع الإبراهيمية'), sentHome.slice(0, 80));
     await mob.close();
   }
+  // Before & after gallery and patient reviews
+  {
+    for (const lang of ['ar', 'en']) {
+      const pre = lang === 'ar' ? '' : '/en';
+      await page.goto(base + pre + '/cases/', { waitUntil: 'networkidle' });
+      const info = await page.evaluate(async () => {
+        const figs = [...document.querySelectorAll('[data-cases] [data-case]')];
+        for (const i of document.querySelectorAll('[data-ba] img')) { i.loading = 'eager'; if (!i.complete) await new Promise((r) => { i.onload = i.onerror = r; }); }
+        return {
+          n: figs.length,
+          loaded: figs.every((f) => [...f.querySelectorAll('img')].length === 2 && [...f.querySelectorAll('img')].every((i) => i.naturalWidth > 0 && i.alt.length > 5)),
+          sameSize: figs.every((f) => { const [a, b] = f.querySelectorAll('img'); return Math.abs(a.naturalWidth / a.naturalHeight - b.naturalWidth / b.naturalHeight) < 0.02; }),
+          ratioKept: figs.every((f) => { const box = f.querySelector('[data-ba]').getBoundingClientRect(); const i = f.querySelector('img'); return Math.abs(box.width / box.height - i.naturalWidth / i.naturalHeight) < 0.03; }),
+          categories: figs.filter((f) => f.dataset.category).length,
+          tags: document.querySelectorAll('[data-cases] .tag').length,
+          durations: document.querySelectorAll('.ba-case__meta').length,
+          filter: !!document.querySelector('[data-case-filter]'),
+          labels: [document.querySelector('.ba__tag--before').textContent, document.querySelector('.ba__tag--after').textContent],
+          text: document.querySelector('main').innerText,
+        };
+      });
+      ok(`${lang} cases: five consented cases shown`, info.n === 5, String(info.n));
+      ok(`${lang} cases: before and after photos load with alt text`, info.loaded);
+      ok(`${lang} cases: before/after pairs share one aspect ratio, displayed undistorted`, info.sameSize && info.ratioKept);
+      ok(`${lang} cases: no invented categories, durations or filter`, info.categories === 0 && info.tags === 0 && info.durations === 0 && !info.filter);
+      ok(`${lang} cases: before/after labels and consent disclaimer`, JSON.stringify(info.labels) === JSON.stringify(lang === 'ar' ? ['قبل', 'بعد'] : ['Before', 'After']) && info.text.includes(lang === 'ar' ? 'بموافقة المرضى' : 'with patient consent'));
+      // slider: keyboard
+      const pos = () => page.$eval('[data-ba]', (e) => parseFloat(e.style.getPropertyValue('--pos')));
+      await page.focus('[data-ba-range]');
+      const p0 = await pos();
+      await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
+      ok(`${lang} cases: slider moves with the keyboard`, (await pos()) === p0 + 2, `${p0} -> ${await pos()}`);
+      // slider: mouse drag
+      await page.locator('[data-ba]').first().evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+      const box = await page.locator('[data-ba]').first().boundingBox();
+      await page.mouse.move(box.x + box.width * 0.5, box.y + box.height / 2); await page.mouse.down();
+      await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2, { steps: 5 }); await page.mouse.up();
+      const dragged = await pos();
+      ok(`${lang} cases: slider drags with the mouse and reveals the image`, dragged > 12 && dragged < 28 && (await page.$eval('.ba__before', (e) => getComputedStyle(e).clipPath)).includes(`${100 - dragged}%`), String(dragged));
+      ok(`${lang} nav + footer link to the gallery`, (await page.$(`#site-nav a[href="${pre}/cases/"][aria-current="page"]`)) !== null && (await page.$(`.site-footer a[href="${pre}/cases/"]`)) !== null);
+      await page.goto(base + pre + '/', { waitUntil: 'networkidle' });
+      ok(`${lang} home: before/after section with link to all cases`, (await page.$$('[data-home-cases] [data-case]')).length === 2 && (await page.$(`section[aria-labelledby="cases-title"] a.btn[href="${pre}/cases/"]`)) !== null);
+      ok(`${lang} home: reviews section hidden while there are no real reviews`, (await page.$('#reviews-title')) === null && (await page.$(`a[href="${pre}/reviews/"]`)) === null);
+      ok(`${lang} reviews page does not exist without real reviews`, (await fetch(base + pre + '/reviews/')).status === 404);
+    }
+    // touch
+    const mob = await browser.newContext(devices['iPhone 13']);
+    const mp = await mob.newPage();
+    await mp.goto(base + '/cases/', { waitUntil: 'networkidle' });
+    const b = await mp.locator('[data-ba]').first().boundingBox();
+    await mp.touchscreen.tap(b.x + b.width * 0.8, b.y + b.height / 2);
+    const tp = await mp.$eval('[data-ba]', (e) => parseFloat(e.style.getPropertyValue('--pos')));
+    ok('mobile: slider responds to touch', tp > 70 && tp < 90, String(tp));
+    ok('mobile: slider allows vertical page scrolling', (await mp.$eval('[data-ba-range]', (e) => getComputedStyle(e).touchAction)) === 'pan-y');
+    ok('mobile: gallery has no horizontal overflow', await mp.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth));
+    await mob.close();
+  }
   // Branch history: chronological order and opening years, in both languages
   {
     const ORDER = ['kafr-negm', 'ibrahimia', 'zagazig'];
@@ -443,7 +500,7 @@ const browser = await chromium.launch();
       shown += r.shown;
       ok(`${path} every displayed phone number is a tappable tel: link`, r.bad.length === 0, JSON.stringify(r.bad));
     }
-    ok('phone numbers are displayed across the site', shown >= 34 * 3, String(shown));
+    ok('phone numbers are displayed across the site', shown >= 36 * 3, String(shown));
     await mob.close();
   }
   // No unfinished placeholders anywhere in the production build, no layout overflow
@@ -456,7 +513,7 @@ const browser = await chromium.launch();
       oldSpelling: document.documentElement.outerHTML.includes('كفر نجم'),
       broken: [...document.images].filter((i) => i.complete && i.naturalWidth === 0).length,
       logo: !!document.querySelector('.site-header img[src="/brand/logo-wordmark.webp"]'),
-      fakeReviews: document.querySelectorAll('.quote').length,
+      fakeReviews: document.querySelectorAll('.quote, .review, [data-reviews]').length,
     }));
     ok(`${path} no visible placeholders`, r.ph === 0 && !r.brackets && !r.waiting, JSON.stringify(r));
     ok(`${path} Kafr Negm spelled كفورنجم only`, !r.oldSpelling);

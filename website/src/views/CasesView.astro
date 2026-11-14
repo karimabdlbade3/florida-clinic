@@ -1,0 +1,62 @@
+---
+import type { Lang } from '../data/branches';
+import { cases, caseCategories, categoryLabel } from '../data/cases';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const c = d.cases;
+const showFilter = caseCategories.length > 1;
+const schema = [{
+  '@type': 'CollectionPage',
+  name: c.pageTitle,
+  url: new URL(localize(routes.cases, lang), Astro.site).href,
+  inLanguage: lang === 'ar' ? 'ar-EG' : 'en',
+}];
+---
+<BaseLayout lang={lang} title={d.seo.casesTitle} description={d.seo.casesDesc} schema={schema}>
+  <PageHero lang={lang} title={c.pageTitle} lead={c.pageLead} crumbs={[{ label: c.pageTitle }]} />
+  <section class="section">
+    <div class="container">
+      {showFilter && (
+        <div class="case-filter" role="group" aria-label={c.all} data-case-filter>
+          <button type="button" class="is-active" data-filter="" aria-pressed="true">{c.all}</button>
+          {caseCategories.map((slug) => <button type="button" data-filter={slug} aria-pressed="false">{categoryLabel(slug, lang)}</button>)}
+        </div>
+      )}
+      <div class="cases-grid" data-cases>
+        {cases.map((item, i) => <BeforeAfter lang={lang} item={item} index={i + 1} eager={i < 2} />)}
+      </div>
+      <p class="muted cases-note">{c.disclaimer}</p>
+    </div>
+  </section>
+  <CtaBand lang={lang} title={c.ctaTitle} text={c.ctaText} />
+</BaseLayout>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-case-filter]');
+  if (bar) {
+    bar.addEventListener('click', (e) => {
+      const btn = (e.target as Element).closest<HTMLButtonElement>('button[data-filter]');
+      if (!btn) return;
+      const f = btn.dataset.filter || '';
+      bar.querySelectorAll('button').forEach((b) => { const on = b === btn; b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', String(on)); });
+      document.querySelectorAll<HTMLElement>('[data-cases] [data-case]').forEach((el) => { el.hidden = Boolean(f) && el.dataset.category !== f; });
+    });
+  }
+</script>
+
+<style>
+  .cases-grid { display: grid; gap: clamp(24px, 3.5vw, 40px); }
+  @media (min-width: 860px) { .cases-grid { grid-template-columns: repeat(2, 1fr); } }
+  .cases-note { margin: 36px 0 0; font-size: .92rem; max-width: 70ch; }
+  .case-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .case-filter button { padding: 9px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink-2); font: inherit; font-size: .95rem; cursor: pointer; }
+  .case-filter button.is-active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+</style>

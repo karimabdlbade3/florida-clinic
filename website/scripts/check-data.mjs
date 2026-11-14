@@ -30,7 +30,8 @@ if (!env.SITE_URL && !process.env.SITE_URL) missing.push('SITE_URL (final domain
 for (const k of ['PUBLIC_GA_ID', 'PUBLIC_META_PIXEL_ID', 'PUBLIC_GSC_VERIFICATION']) if (!env[k] && !process.env[k]) missing.push(`${k} (optional)`);
 missing.push('Confirm English transliteration of street/shop names in branch addresses');
 // Content
-if (/testimonials: Testimonial\[\] = \[\];/.test(read('src/data/testimonials.ts'))) missing.push('Testimonials (real, with written consent)');
+if (/allTestimonials: Testimonial\[\] = \[\];/.test(read('src/data/testimonials.ts'))) missing.push('Patient reviews (real, with consent): src/data/testimonials.ts (section and page stay hidden until then)');
+if (!/category:/.test(read('src/data/cases.ts').split('const allCases')[1] || '')) missing.push('Before/after cases: verified treatment category for each case (optional; shown without category for now)');
 const photos = existsSync(resolve(root, 'src/assets/photos')) ? readdirSync(resolve(root, 'src/assets/photos'), { recursive: true }).filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(String(f))) : [];
 if (!photos.length) missing.push('Real clinic photography (src/assets/photos)');
 if (!existsSync(resolve(root, 'src/assets/brand/florida-logo-original.png'))) missing.push('Official logo file');

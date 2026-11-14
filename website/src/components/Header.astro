@@ -4,6 +4,8 @@ import { t } from '../i18n/ui';
 import { localize, routes } from '../lib/urls';
 import { branches } from '../data/branches';
 import { mainServices, secondaryServices } from '../data/services';
+import { cases } from '../data/cases';
+import { testimonials } from '../data/testimonials';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 
@@ -30,6 +32,8 @@ const items: Item[] = [
     label: d.nav.branches,
     sub: branches.map((b) => ({ href: routes.branch(b.slug), label: b.name[lang], note: String(b.opened) })),
   },
+  ...(cases.length > 0 ? [{ href: routes.cases, label: d.cases.nav }] : []),
+  ...(testimonials.length > 0 ? [{ href: routes.reviews, label: d.reviews.nav }] : []),
   { href: routes.contact, label: d.nav.contact },
 ];
 const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));

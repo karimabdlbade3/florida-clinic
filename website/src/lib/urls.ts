@@ -9,6 +9,8 @@ export const routes = {
   service: (slug: string) => `/services/${slug}/`,
   branches: '/branches/',
   branch: (slug: string) => `/branches/${slug}/`,
+  cases: '/cases/',
+  reviews: '/reviews/',
   contact: '/contact/',
   privacy: '/privacy/',
 };

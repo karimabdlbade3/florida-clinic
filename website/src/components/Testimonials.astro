@@ -1,53 +1,64 @@
 ---
-/** Shows real testimonials only. Empty data = honest empty state, never fake quotes. */
+/**
+ * Patient reviews. Shows genuine, consented reviews only (src/data/testimonials.ts).
+ * Renders nothing when there are none for this language: never fake quotes.
+ */
 import type { Lang } from '../data/branches';
 import { testimonials } from '../data/testimonials';
-import { site } from '../config/site';
+import { services } from '../data/services';
 import { t } from '../i18n/ui';
 import { localize, routes } from '../lib/urls';
 import Icon from './Icon.astro';
-interface Props { lang: Lang }
-const { lang } = Astro.props;
-const d = t(lang);
-const list = testimonials.filter((x) => x.lang === lang).slice(0, 6);
-const reviewHref = site.googleReviews ?? localize(routes.contact, lang);
-const external = Boolean(site.googleReviews);
+interface Props { lang: Lang; limit?: number; page?: boolean }
+const { lang, limit = 3, page = false } = Astro.props;
+const d = t(lang).reviews;
+const all = [...testimonials.filter((x) => x.lang === lang), ...testimonials.filter((x) => x.lang !== lang)];
+const list = page ? all : all.slice(0, limit);
+const serviceName = (slug?: string) => services.find((s) => s.slug === slug)?.name[lang];
+const fmtDate = (v?: string) => {
+  if (!v) return null;
+  const dt = new Date(v.length === 7 ? v + '-01' : v);
+  return isNaN(+dt) ? null : new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-GB', { year: 'numeric', month: 'long' }).format(dt);
+};
 ---
-{(list.length > 0 || external) && (
-<section class="section section--ivory" aria-labelledby="testimonials-title">
-  <div class="container">
-    <div class="section-head section-head--center reveal">
-      <p class="eyebrow">{d.home.testimonialsEyebrow}</p>
-      <h2 id="testimonials-title">{d.home.testimonialsTitle}</h2>
-    </div>
-    {list.length > 0 ? (
-      <div class="grid grid--3">
+{list.length > 0 && (
+  <section class:list={['section', !page && 'section--ivory']} aria-labelledby="reviews-title">
+    <div class="container">
+      {!page && (
+        <div class="section-head reveal">
+          <p class="eyebrow">{d.eyebrow}</p>
+          <h2 id="reviews-title">{d.title}</h2>
+        </div>
+      )}
+      {page && <h2 id="reviews-title" class="sr-only">{d.title}</h2>}
+      <div class="grid grid--3" data-reviews>
         {list.map((x, i) => (
-          <figure class="card quote reveal" data-delay={String(i % 3)}>
-            {x.rating && <p class="quote__stars" aria-label={`${x.rating}/5`}>{'★'.repeat(x.rating)}</p>}
-            <blockquote><p>{x.quote}</p></blockquote>
-            <figcaption>{x.author}</figcaption>
+          <figure class="card review reveal" data-delay={String(i % 3)}>
+            <span class="review__mark" aria-hidden="true">”</span>
+            {x.rating && <p class="review__stars" role="img" aria-label={d.ratingLabel(x.rating)}>{'★'.repeat(x.rating)}<span>{'★'.repeat(5 - x.rating)}</span></p>}
+            <blockquote lang={x.lang} dir={x.lang === 'ar' ? 'rtl' : 'ltr'}><p>{x.quote}</p></blockquote>
+            <figcaption>
+              <span class="review__name">{x.name ?? d.anonymous}</span>
+              <span class="review__meta">{[serviceName(x.service), fmtDate(x.date)].filter(Boolean).join(' · ')}</span>
+            </figcaption>
           </figure>
         ))}
       </div>
-    ) : (
-      <div class="quote-empty reveal">
-        <span class="icon-badge"><Icon name="chat" /></span>
-        <p>{d.home.testimonialsEmpty}</p>
-        <a class="btn btn--outline" href={reviewHref} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
-          <Icon name="star" />{d.home.testimonialsReview}
-        </a>
-      </div>
-    )}
-  </div>
-</section>
+      {!page && all.length > list.length && (
+        <p style="margin-top:28px"><a class="btn btn--outline" href={localize(routes.reviews, lang)}>{d.viewAll} <Icon name="arrow" class="flip" /></a></p>
+      )}
+    </div>
+  </section>
 )}
 
 <style>
-  .quote blockquote { margin: 0 0 20px; font-size: 1.08rem; color: var(--ink); }
-  .quote figcaption { color: var(--gold-700); font-weight: 500; }
-  .quote__stars { color: var(--gold-500); letter-spacing: 2px; margin-bottom: 10px; }
-  .quote-empty { max-width: 620px; margin-inline: auto; text-align: center; padding: clamp(28px, 4vw, 44px); border: 1px dashed var(--gold-300); border-radius: var(--radius-lg); background: var(--white); }
-  .quote-empty .icon-badge { margin-inline: auto; }
-  .quote-empty p { color: var(--ink-2); }
+  .review { display: flex; flex-direction: column; margin: 0; }
+  .review__mark { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 4rem; line-height: .6; color: var(--gold-400); height: 34px; }
+  .review__stars { margin: 0 0 10px; color: var(--gold-500); letter-spacing: 2px; }
+  .review__stars span { color: var(--line); }
+  .review blockquote { margin: 0 0 20px; flex: 1; }
+  .review blockquote p { color: var(--ink); font-size: 1.05rem; margin: 0; }
+  .review figcaption { display: grid; gap: 2px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .review__name { font-weight: 600; }
+  .review__meta { color: var(--ink-3); font-size: .9rem; }
 </style>

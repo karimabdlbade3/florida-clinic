@@ -1,0 +1,38 @@
+---
+/** Home page before/after section. Renders nothing when no consented cases exist. */
+import type { Lang } from '../data/branches';
+import { cases } from '../data/cases';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import BeforeAfter from './BeforeAfter.astro';
+import Icon from './Icon.astro';
+interface Props { lang: Lang; limit?: number }
+const { lang, limit = 2 } = Astro.props;
+const d = t(lang).cases;
+const shown = cases.slice(0, limit);
+---
+{cases.length > 0 && (
+  <section class="section section--ivory" aria-labelledby="cases-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">{d.eyebrow}</p>
+        <h2 id="cases-title">{d.title}</h2>
+        <p>{d.lead}</p>
+      </div>
+      <div class="cases-grid" data-home-cases>
+        {shown.map((c) => <div class="reveal"><BeforeAfter lang={lang} item={c} index={cases.indexOf(c) + 1} /></div>)}
+      </div>
+      <div class="cases-foot reveal">
+        <p class="muted">{d.disclaimer}</p>
+        <a class="btn" href={localize(routes.cases, lang)}>{d.viewAll} <Icon name="arrow" class="flip" /></a>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .cases-grid { display: grid; gap: clamp(20px, 3vw, 32px); }
+  @media (min-width: 860px) { .cases-grid { grid-template-columns: repeat(2, 1fr); } }
+  .cases-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: 32px; }
+  .cases-foot p { margin: 0; max-width: 60ch; font-size: .92rem; }
+</style>

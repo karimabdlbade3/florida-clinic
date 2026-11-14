@@ -5,7 +5,7 @@ for Florida Dental Clinics: Kafr Negm, Ibrahimia (main) and Zagazig.
 
 - **Stack:** [Astro 7](https://astro.build) static site, no UI framework, about 2 KB of JavaScript on most pages (about 6 KB on the booking page).
 - **Output:** plain HTML/CSS/JS in `dist/`. It runs on any static host, with no server or database.
-- **Pages (34):** Home, About, Services + 8 service pages (the seven official categories plus general care), Branches + 3 branch pages, Contact & Booking, Privacy, in Arabic (`/`) and English (`/en/`), plus a 404 page.
+- **Pages (36):** Home, About, Services + 8 service pages (the seven official categories plus general care), Before & After gallery, Branches + 3 branch pages, Contact & Booking, Privacy, in Arabic (`/`) and English (`/en/`), plus a 404 page.
 
 ## Run locally
 
@@ -30,6 +30,7 @@ npm run test:e2e          # full QA suite (needs Playwright + Chromium)
 | Service texts (AR/EN), FAQs, SEO titles | `src/data/services.ts` |
 | All interface text, page copy, SEO for main pages | `src/i18n/ui.ts` |
 | Brand name, tagline, working hours, booking WhatsApp, social links | `src/config/site.ts` |
+| Before & after cases (real, with consent only) | `src/data/cases.ts` + photos in `src/assets/cases/` |
 | Patient reviews (real, with consent only) | `src/data/testimonials.ts` |
 | Service card photos (temporary stock) | `src/assets/stock/` (see README there), registered in `src/data/media.ts` |
 | Photos | `src/assets/photos/` folders, registered in `src/data/media.ts` (see README there) |
@@ -43,6 +44,25 @@ is in place. Anything still unknown is kept as `null` and shows as a clearly mar
 
 Branch phone numbers are used for `tel:` calls only. All WhatsApp buttons and the booking form use the single
 official booking WhatsApp unless a branch gets its own `whatsapp` value.
+
+## Adding before & after cases and patient reviews
+
+No database or CMS is needed: cases and reviews are plain entries in two files, and the site is rebuilt after a change.
+
+**Add a case**
+1. Save two photos with the same framing and size in `src/assets/cases/` as `case-06-before.jpg` and `case-06-after.jpg`
+   (teeth only, no faces or names).
+2. In `src/data/cases.ts`, import both and add a line: `{ id: 'case-06', before: c06b, after: c06a, consent: true }`.
+   Optional verified fields: `category` (a service slug, `veneers` or `other`), `description`, `duration`.
+3. `npm run build`. A category filter appears on the gallery automatically once two or more categories are in use.
+
+**Add a review**: in `src/data/testimonials.ts` add, for example,
+`{ lang: 'ar', quote: '...', name: 'منى أ.', rating: 5, service: 'orthodontics', date: '2026-10', consent: true }`.
+`name`, `rating`, `service` and `date` are optional. The home section, the `/reviews/` page and the menu link appear once one review exists.
+
+Only entries with `consent: true` are ever rendered. Keep the signed consent records outside this repository.
+If non-technical staff need to add cases themselves later, a free Git-based CMS (for example Decap CMS) can be added on
+top of these same files without changing the design; that is optional and not set up.
 
 ## How booking works (honest by design)
 
@@ -158,7 +178,7 @@ Organization, Dentist per branch (only verified fields), MedicalWebPage, FAQPage
 
 ## QA status (at handover)
 
-- `npm run test:e2e`: 1017/1017 checks pass: official business data (phones, maps, hours, WhatsApp, social links,
+- `npm run test:e2e`: 1080/1080 checks pass: official business data (phones, maps, hours, WhatsApp, social links,
   branch schema) in both languages, all 30 pages, no visible placeholders, no broken images, form validation and
   WhatsApp hand-off with every field preserved, endpoint success/failure, 404, sitemap, and no horizontal overflow
   at 320 / 375 / 390 / 768 / 1024 / 1440 px, the seven service categories in official order, navigation menus,

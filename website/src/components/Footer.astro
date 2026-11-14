@@ -3,6 +3,8 @@ import type { Lang } from '../data/branches';
 import { branches } from '../data/branches';
 import { services } from '../data/services';
 import { site } from '../config/site';
+import { cases } from '../data/cases';
+import { testimonials } from '../data/testimonials';
 import { t } from '../i18n/ui';
 import { localize, routes, whatsappLink, telLink } from '../lib/urls';
 import Logo from './Logo.astro';
@@ -51,6 +53,8 @@ const socials = site.social;
       <h2 class="site-footer__title">{d.footer.explore}</h2>
       <ul>
         <li><a href={localize(routes.about, lang)}>{d.nav.about}</a></li>
+        {cases.length > 0 && <li><a href={localize(routes.cases, lang)}>{d.cases.pageTitle}</a></li>}
+        {testimonials.length > 0 && <li><a href={localize(routes.reviews, lang)}>{d.reviews.pageTitle}</a></li>}
         <li><a href={localize(routes.contact, lang)}>{d.nav.contact}</a></li>
         <li><a href={localize(routes.privacy, lang)}>{d.footer.privacy}</a></li>
       </ul>
