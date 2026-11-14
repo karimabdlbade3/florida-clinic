@@ -1,0 +1,115 @@
+---
+import '@fontsource/ibm-plex-sans-arabic/400.css';
+import '@fontsource/ibm-plex-sans-arabic/500.css';
+import '@fontsource/ibm-plex-sans-arabic/600.css';
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '../styles/global.css';
+// Preloaded so headings do not reflow when the web font arrives (layout stability).
+import displayFontEn from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff2?url';
+import bodyFontAr from '@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-600-normal.woff2?url';
+import bodyFontEn from '@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-latin-400-normal.woff2?url';
+import bodyFontEn500 from '@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-latin-500-normal.woff2?url';
+
+import type { Lang } from '../data/branches';
+import { languages, t } from '../i18n/ui';
+import { site, safeGaId, safePixelId } from '../config/site';
+import { localize, neutralPath } from '../lib/urls';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import Analytics from '../components/Analytics.astro';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Extra JSON-LD objects for this page. */
+  schema?: Record<string, unknown>[];
+  ogImage?: string;
+  noindex?: boolean;
+  waMessage?: string;
+  /** Set false for pages that exist in one language only (e.g. 404). */
+  alternates?: boolean;
+}
+const { lang, title, description, schema = [], ogImage = '/og-image.png', noindex = false, waMessage, alternates = true } = Astro.props;
+const d = t(lang);
+const L = languages[lang];
+const path = neutralPath(Astro.url.pathname);
+const siteUrl = Astro.site!;
+const canonical = new URL(localize(path, lang), siteUrl).href;
+const altAr = new URL(localize(path, 'ar'), siteUrl).href;
+const altEn = new URL(localize(path, 'en'), siteUrl).href;
+const ogImg = new URL(ogImage, siteUrl).href;
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': new URL('/#organization', siteUrl).href,
+  name: site.brand.en,
+  alternateName: site.brand.ar,
+  url: siteUrl.href,
+  logo: new URL('/brand/logo-mark.png', siteUrl).href,
+  foundingDate: String(site.foundedYear),
+  slogan: site.tagline[lang],
+  ...(site.contact.whatsapp ? { contactPoint: { '@type': 'ContactPoint', contactType: 'reservations', telephone: '+' + site.contact.whatsapp, availableLanguage: ['ar', 'en'] } } : {}),
+  sameAs: site.social.map((x) => x.url),
+};
+const ldJson = (o: unknown) => JSON.stringify(o).replace(/</g, '\\u003c');
+---
+<!doctype html>
+<html lang={lang} dir={L.dir} data-ga={safeGaId ?? undefined} data-pixel={safePixelId ?? undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {(lang === 'en' ? [displayFontEn, bodyFontEn, bodyFontEn500] : [bodyFontAr]).map((f) => <link rel="preload" as="font" type="font/woff2" href={f} crossorigin />)}
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates && <link rel="alternate" hreflang="ar-EG" href={altAr} />}
+    {alternates && <link rel="alternate" hreflang="en" href={altEn} />}
+    {alternates && <link rel="alternate" hreflang="x-default" href={altAr} />}
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon-192.png" sizes="192x192" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.brand[lang]} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImg} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={L.ogLocale} />
+    <meta property="og:locale:alternate" content={lang === 'ar' ? 'en_US' : 'ar_EG'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImg} />
+    {site.integrations.gscVerification && /^[\w-]{10,100}$/.test(site.integrations.gscVerification) && (
+      <meta name="google-site-verification" content={site.integrations.gscVerification} />
+    )}
+
+    <script type="application/ld+json" set:html={ldJson(orgSchema)} />
+    {schema.map((s) => <script type="application/ld+json" set:html={ldJson({ '@context': 'https://schema.org', ...s })} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{d.skip}</a>
+    <Header lang={lang} path={path} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <WhatsAppFloat lang={lang} message={waMessage} />
+    <script>
+      import '../scripts/site';
+    </script>
+    {(safeGaId || safePixelId) && <Analytics />}
+  </body>
+</html>

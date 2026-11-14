@@ -1,0 +1,19 @@
+---
+import type { Lang } from '../data/branches';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Testimonials from '../components/Testimonials.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const schema = [{ '@type': 'CollectionPage', name: d.reviews.pageTitle, url: new URL(localize(routes.reviews, lang), Astro.site).href }];
+---
+<BaseLayout lang={lang} title={d.seo.reviewsTitle} description={d.seo.reviewsDesc} schema={schema}>
+  <PageHero lang={lang} title={d.reviews.pageTitle} lead={d.reviews.pageLead} crumbs={[{ label: d.reviews.pageTitle }]} />
+  <Testimonials lang={lang} page />
+  <CtaBand lang={lang} />
+</BaseLayout>

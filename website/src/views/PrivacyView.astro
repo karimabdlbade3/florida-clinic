@@ -1,0 +1,61 @@
+---
+/**
+ * Privacy notice. States only what the website actually does.
+ * LEGAL REVIEW REQUIRED before launch: retention period, legal basis and
+ * patient rights wording must be approved by management / legal counsel.
+ */
+import type { Lang } from '../data/branches';
+import { t } from '../i18n/ui';
+import { site } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const storesNothing = !site.integrations.bookingEndpoint;
+const analyticsOn = Boolean(site.integrations.gaId || site.integrations.metaPixelId);
+
+const content = lang === 'ar' ? {
+  sections: [
+    { h: 'البيانات التي نجمعها', p: ['عند إرسال طلب موعد، نستخدم البيانات التي تكتبها بنفسك فقط: الاسم، رقم الموبايل، الفرع، الخدمة، الموعد المفضل، وأي ملاحظات تضيفها.', 'لا يطلب الموقع أي بيانات طبية، ونرجو عدم كتابة معلومات صحية حساسة في النموذج.'] },
+    { h: 'كيف نستخدم بياناتك', p: ['نستخدم بياناتك للتواصل معك بخصوص طلب الموعد وتأكيده فقط، ولا نبيع بياناتك أو نشاركها مع جهات تسويقية.'] },
+    { h: 'واتساب', p: ['عند اختيار إرسال الطلب عبر واتساب، يتم فتح تطبيق واتساب برسالة جاهزة، ولا تُرسل الرسالة إلا عندما تضغط "إرسال" بنفسك. تخضع المحادثة لسياسة خصوصية واتساب.'] },
+    { h: 'ملفات تعريف الارتباط والتحليلات', p: [analyticsOn ? 'يستخدم الموقع أدوات تحليل (مثل Google Analytics و/أو Meta Pixel) لفهم كيفية استخدام الموقع وتحسينه. قد تستخدم هذه الأدوات ملفات تعريف الارتباط.' : 'لا يستخدم الموقع حاليًا أدوات تحليل أو ملفات تعريف ارتباط للتتبع. سيتم تحديث هذه الصفحة إذا تغير ذلك.'] },
+    { h: 'حفظ البيانات', p: [storesNothing ? 'الموقع نفسه لا يخزّن بيانات طلب الموعد. يصل طلبك إلى فريق الاستقبال عبر واتساب، ويُستخدم لترتيب موعدك والتواصل معك بخصوصه فقط.' : 'تُرسل بيانات طلب الموعد إلى نظام المواعيد الخاص بالعيادات، وتُستخدم لترتيب موعدك والتواصل معك بخصوصه فقط.', 'يمكنك في أي وقت طلب حذف بياناتك بالتواصل معنا.'] },
+    { h: 'حقوقك والتواصل', p: ['يمكنك طلب الاطلاع على بياناتك أو تصحيحها أو حذفها بالتواصل معنا عبر بيانات التواصل الموضحة في صفحة "تواصل واحجز".'] },
+  ],
+  updated: 'آخر تحديث: نوفمبر 2026',
+} : {
+  sections: [
+    { h: 'What we collect', p: ['When you send an appointment request, we only use the details you enter yourself: name, mobile number, branch, service, preferred time and any notes you add.', 'The website does not ask for medical information. Please do not include sensitive health details in the form.'] },
+    { h: 'How we use it', p: ['We use your details only to contact you about your appointment request. We do not sell your data or share it with marketing companies.'] },
+    { h: 'WhatsApp', p: ['If you send your request via WhatsApp, the app opens with a pre-filled message, and nothing is sent until you tap "Send" yourself. The conversation is subject to WhatsApp’s privacy policy.'] },
+    { h: 'Cookies and analytics', p: [analyticsOn ? 'This website uses analytics tools (such as Google Analytics and/or Meta Pixel) to understand how the site is used and improve it. These tools may use cookies.' : 'This website does not currently use analytics or tracking cookies. This page will be updated if that changes.'] },
+    { h: 'Data storage', p: [storesNothing ? 'The website itself does not store appointment request data. Your request reaches our reception team through WhatsApp and is used only to arrange your appointment and contact you about it.' : 'Appointment request data is sent to the clinics’ appointment system and is used only to arrange your appointment and contact you about it.', 'You can ask us to delete your data at any time by contacting us.'] },
+    { h: 'Your rights and contact', p: ['You can ask to see, correct or delete your data by contacting us using the details on the Contact page.'] },
+  ],
+  updated: 'Last updated: November 2026',
+};
+---
+<BaseLayout lang={lang} title={d.seo.privacyTitle} description={d.seo.privacyDesc}>
+  <PageHero lang={lang} title={d.privacy.title} crumbs={[{ label: d.privacy.title }]} />
+  <section class="section">
+    <div class="container prose">
+      {content.sections.map((s) => (
+        <section>
+          <h2>{s.h}</h2>
+          {s.p.map((p) => <p>{p}</p>)}
+        </section>
+      ))}
+      <p class="muted">{content.updated}</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose { max-width: 780px; }
+  .prose h2 { font-size: clamp(1.3rem, 1.15rem + .5vw, 1.6rem); margin-top: 1.6em; }
+  :global(html[lang='en']) .prose h2 { font-size: clamp(1.6rem, 1.4rem + .8vw, 2rem); }
+  .prose p { color: var(--ink-2); }
+</style>

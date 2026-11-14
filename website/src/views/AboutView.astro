@@ -1,0 +1,142 @@
+---
+import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { team } from '../data/team';
+import { media } from '../data/media';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import PhotoSlot from '../components/PhotoSlot.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const a = d.about;
+const valueIcons = ['heart', 'shield', 'users', 'chat', 'star'];
+const schema = [{
+  '@type': 'AboutPage',
+  name: a.title,
+  url: new URL(localize(routes.about, lang), Astro.site).href,
+  inLanguage: lang === 'ar' ? 'ar-EG' : 'en',
+}];
+---
+<BaseLayout lang={lang} title={d.seo.aboutTitle} description={d.seo.aboutDesc} schema={schema}>
+  <PageHero lang={lang} title={a.title} lead={a.lead} crumbs={[{ label: a.title }]} />
+
+  <section class="section">
+    <div class="container story">
+      <div class="reveal">
+        <p class="eyebrow">{a.storyTitle}</p>
+        <h2>{lang === 'ar' ? 'بدأنا عام 2020 في كفورنجم' : 'It began in 2020, in Kafr Negm'}</h2>
+        {a.story.map((p) => <p class="lead">{p}</p>)}
+      </div>
+      <div class="reveal" data-delay="1">
+        <PhotoSlot src={media.aboutStory ?? undefined} alt={d.placeholder.photo} ratio="4 / 5" shape="arch" motif="tooth" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--ivory" aria-labelledby="timeline-title">
+    <div class="container">
+      <h2 id="timeline-title" class="sr-only">{lang === 'ar' ? 'مراحل التطور' : 'Our journey'}</h2>
+      <ol class="timeline">
+        {a.timeline.map((x, i) => (
+          <li class="reveal" data-delay={String(i)}>
+            <span class="timeline__year">{x.year}</span>
+            <p>{x.text}</p>
+          </li>
+        ))}
+      </ol>
+      <ul class="timeline__branches reveal">
+        {branches.map((b) => (
+          <li><a href={localize(routes.branch(b.slug), lang)}><Icon name="pin" />{b.name[lang]} <span class="muted">{b.opened}</span>{b.isMain && <span class="tag">{d.branches.main}</span>}</a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid grid--2">
+      <article class="card vm reveal">
+        <p class="eyebrow">{a.visionTitle}</p>
+        <p class="vm__text">{a.vision}</p>
+      </article>
+      <article class="card vm reveal" data-delay="1">
+        <p class="eyebrow">{a.missionTitle}</p>
+        <p class="vm__text">{a.mission}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section section--sand" aria-labelledby="values-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">{a.valuesTitle}</p>
+        <h2 id="values-title">{d.home.whyTitle}</h2>
+      </div>
+      <div class="grid grid--3">
+        {d.values.map((v, i) => (
+          <article class="card reveal" data-delay={String(i % 3)}>
+            <span class="icon-badge"><Icon name={valueIcons[i]} /></span>
+            <h3>{v.title}</h3>
+            <p>{v.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container story story--reverse">
+      <div class="reveal">
+        <p class="eyebrow">{d.home.experienceEyebrow}</p>
+        <h2>{a.experienceTitle}</h2>
+        {a.experienceText.map((p) => <p class="lead">{p}</p>)}
+      </div>
+      <div class="reveal" data-delay="1">
+        <PhotoSlot src={media.aboutCare ?? undefined} alt={d.placeholder.photo} ratio="5 / 4" motif="family" />
+      </div>
+    </div>
+  </section>
+
+  {team.length > 0 && (
+    <section class="section section--ivory" aria-labelledby="team-title">
+      <div class="container">
+        <h2 id="team-title" class="reveal">{a.teamTitle}</h2>
+        <div class="grid grid--3">
+          {team.map((m) => (
+            <article class="card reveal">
+              {m.photo && <PhotoSlot src={m.photo} alt={m.name[lang]} ratio="1 / 1" />}
+              <h3 style="margin-top:18px">{m.name[lang]}</h3>
+              <p>{m.title[lang]}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CtaBand lang={lang} />
+</BaseLayout>
+
+<style>
+  .story { display: grid; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  @media (min-width: 900px) { .story { grid-template-columns: 1.1fr .9fr; } }
+  .story .photo { max-width: 440px; margin-inline: auto; }
+  .timeline { list-style: none; display: grid; gap: 24px; }
+  @media (min-width: 800px) { .timeline { grid-template-columns: repeat(3, 1fr); gap: 0; } .timeline li { padding-inline-end: 32px; } }
+  .timeline li { position: relative; padding-top: 28px; border-top: 1px solid var(--gold-300); }
+  .timeline li::before { content: ''; position: absolute; top: -6px; inset-inline-start: 0; width: 11px; height: 11px; border-radius: 50%; background: var(--gold-500); box-shadow: 0 0 0 5px var(--ivory); }
+  .timeline__year { display: block; margin-bottom: 8px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2rem; font-weight: 600; color: var(--gold-700); line-height: 1.2; }
+  :global(html[lang='ar']) .timeline__year { font-family: var(--font-sans); font-size: 1.5rem; font-weight: 500; }
+  .timeline p { color: var(--ink-2); margin: 0; }
+  .timeline__branches { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 48px; }
+  .timeline__branches a { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 999px; background: var(--white); border: 1px solid var(--line); text-decoration: none; }
+  .timeline__branches a:hover { border-color: var(--gold-400); }
+  .timeline__branches :global(svg) { width: 18px; height: 18px; color: var(--gold-600); }
+  .vm__text { font-family: var(--font-display); font-size: clamp(1.25rem, 1.1rem + .7vw, 1.7rem); line-height: 1.5; color: var(--ink) !important; margin: 0; }
+  :global(html[lang='en']) .vm__text { line-height: 1.3; font-weight: 500; }
+</style>

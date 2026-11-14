@@ -1,0 +1,103 @@
+---
+import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { site } from '../config/site';
+import { t } from '../i18n/ui';
+import { localize, routes, whatsappLink, telLink } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import BookingForm from '../components/BookingForm.astro';
+import Icon from '../components/Icon.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const wa = whatsappLink(d.whatsappDefault);
+const tel = telLink(site.contact.phone);
+const schema = [{ '@type': 'ContactPage', name: d.contact.title, url: new URL(localize(routes.contact, lang), Astro.site).href }];
+---
+<BaseLayout lang={lang} title={d.seo.contactTitle} description={d.seo.contactDesc} schema={schema}>
+  <PageHero lang={lang} title={d.contact.title} lead={d.contact.lead} crumbs={[{ label: d.nav.contact }]} />
+
+  <section class="section contact-section" id="booking">
+    <div class="container contact">
+      <div class="card contact__form">
+        <h2 class="contact__h">{d.contact.formTitle}</h2>
+        <BookingForm lang={lang} />
+      </div>
+
+      <aside class="contact__aside" aria-labelledby="channels-title">
+        <h2 id="channels-title" class="contact__h">{d.contact.channelsTitle}</h2>
+        <div class="channels">
+          {wa
+            ? <a class="btn btn--wa btn--block" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>
+            : <p><span class="ph">{lang === 'ar' ? 'رقم واتساب: بانتظار التأكيد' : 'WhatsApp number: awaiting confirmation'}</span></p>}
+          {tel
+            ? <a class="btn btn--outline btn--block" href={tel} data-track="call_click"><Icon name="phone" />{d.cta.call} <span dir="ltr">{site.contact.phone}</span></a>
+            : branches.map((b) => b.phone && (
+                <a class="btn btn--outline btn--block" href={telLink(b.phone)} data-track="call_click"><Icon name="phone" />{b.name[lang]} <span dir="ltr">{b.phone}</span></a>
+              ))}
+          {site.contact.email && <a class="btn btn--outline btn--block" href={`mailto:${site.contact.email}`}><Icon name="mail" />{site.contact.email}</a>}
+        </div>
+
+        <h2 class="contact__h" style="margin-top:36px">{d.contact.hoursTitle}</h2>
+        <div class="contact__hours">
+          <Icon name="clock" />
+          <div>
+            <ul>{site.hours.lines[lang].map((h) => <li>{h}</li>)}</ul>
+            <p>{site.hours.sentence[lang]}</p>
+          </div>
+        </div>
+
+        <h2 class="contact__h" style="margin-top:36px">{d.contact.branchesTitle}</h2>
+        <ul class="contact__branches">
+          {branches.map((b) => {
+            const bwa = b.whatsapp ? whatsappLink(`${d.whatsappDefault} ${b.name[lang]}`, b.whatsapp) : null;
+            const btel = telLink(b.phone);
+            return (
+              <li>
+                <h3><a href={localize(routes.branch(b.slug), lang)}>{b.name[lang]}</a>{b.isMain && <span class="tag" style="margin-inline-start:8px">{d.branches.main}</span>}</h3>
+                <p>{d.branches.opened(b.opened)}</p>
+                <p>{b.address ? b.address[lang] : <span class="ph">{d.placeholder.address}</span>}</p>
+                {b.address && lang !== 'ar' && <p lang="ar" dir="rtl">{b.address.ar}</p>}
+                <p>{b.phone ? <a href={btel!} dir="ltr" data-track="call_click">{b.phone}</a> : <span class="ph">{d.placeholder.phone}</span>}</p>
+                <p>{b.hours ? b.hours[lang].join(lang === 'ar' ? '، ' : ' · ') : <span class="ph">{d.placeholder.hours}</span>}</p>
+                {b.mapLink && <p><a href={b.mapLink} target="_blank" rel="noopener" data-track="directions_click">{d.cta.directions}</a></p>}
+                {bwa && <p><a href={bwa} target="_blank" rel="noopener" data-track="whatsapp_click">{d.cta.whatsapp}</a></p>}
+              </li>
+            );
+          })}
+        </ul>
+
+        <h2 class="contact__h" style="margin-top:36px">{d.contact.socialTitle}</h2>
+        <ul class="contact__social">
+          {site.social.map((x) => <li><a href={x.url} target="_blank" rel="noopener" data-track="social_click">{x.label[lang]}</a></li>)}
+        </ul>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-section { padding-top: clamp(40px, 5vw, 64px); scroll-margin-top: 80px; }
+  .contact { display: grid; gap: 40px; align-items: start; }
+  @media (min-width: 1000px) { .contact { grid-template-columns: 1.35fr .65fr; gap: 48px; } }
+  .contact__form { box-shadow: var(--shadow); }
+  .contact__h { font-size: clamp(1.4rem, 1.2rem + .6vw, 1.8rem); margin-bottom: 20px; }
+  :global(html[lang='en']) .contact__h { font-size: clamp(1.7rem, 1.4rem + 1vw, 2.2rem); }
+  .channels { display: grid; gap: 12px; }
+  .channels .btn { white-space: normal; text-align: center; }
+  .contact__hours { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 18px; border-radius: 16px; background: var(--ivory); border: 1px solid var(--gold-200); }
+  .contact__hours :global(svg) { width: 22px; height: 22px; margin-top: .3em; color: var(--gold-600); }
+  .contact__hours ul { list-style: none; font-weight: 500; }
+  .contact__hours p { margin: 8px 0 0; font-size: .92rem; color: var(--ink-2); }
+  .contact__social { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .contact__social a { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-size: .92rem; }
+  .contact__social a:hover { border-color: var(--gold-400); }
+  .contact__branches { list-style: none; display: grid; gap: 0; }
+  .contact__branches li { padding-block: 18px; border-top: 1px solid var(--line); }
+  .contact__branches h3 { font-family: var(--font-sans); font-size: 1.08rem; font-weight: 600; line-height: 1.5; letter-spacing: 0; margin-bottom: 8px; }
+  .contact__branches h3 a { text-decoration: none; }
+  .contact__branches p { margin: 0 0 6px; font-size: .95rem; color: var(--ink-2); }
+  @media (min-width: 1000px) { .contact__aside { position: sticky; top: 100px; } }
+</style>

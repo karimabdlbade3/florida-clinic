@@ -1,0 +1,65 @@
+---
+/**
+ * Before/after comparison slider.
+ * A native range input drives it, so it works with touch, mouse and keyboard
+ * and vertical page scrolling still works on phones. Without JavaScript it
+ * shows a fixed half-and-half view.
+ */
+import { Picture } from 'astro:assets';
+import type { Lang } from '../data/branches';
+import type { Case } from '../data/cases';
+import { categoryLabel } from '../data/cases';
+import { t } from '../i18n/ui';
+interface Props { lang: Lang; item: Case; index: number; eager?: boolean }
+const { lang, item, index, eager = false } = Astro.props;
+const d = t(lang).cases;
+const label = categoryLabel(item.category, lang);
+const ratio = `${item.after.width} / ${item.after.height}`;
+const sizes = '(min-width: 1024px) 600px, 100vw';
+---
+<figure class="ba-case" data-case={item.id} data-category={item.category ?? ''}>
+  <div class="ba" style={`aspect-ratio:${ratio}`} data-ba dir="ltr">
+    <Picture class="ba__img" src={item.after} alt={d.afterAlt(index)} formats={['avif', 'webp']} widths={[480, 800, 1320]} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />
+    <div class="ba__before">
+      <Picture class="ba__img" src={item.before} alt={d.beforeAlt(index)} formats={['avif', 'webp']} widths={[480, 800, 1320]} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />
+    </div>
+    <span class="ba__tag ba__tag--before" aria-hidden="true">{d.before}</span>
+    <span class="ba__tag ba__tag--after" aria-hidden="true">{d.after}</span>
+    <span class="ba__handle" aria-hidden="true"><span></span></span>
+    <input class="ba__range" type="range" min="0" max="100" value="50" step="1" aria-label={d.sliderLabel(index)} data-ba-range />
+  </div>
+  <figcaption>
+    <span class="ba-case__title">{d.caseTitle(index)}</span>
+    {label && <span class="tag">{label}</span>}
+    {item.duration && <span class="ba-case__meta">{d.duration}: {item.duration[lang]}</span>}
+    {item.description && <p>{item.description[lang]}</p>}
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ba]').forEach((el) => {
+    const range = el.querySelector<HTMLInputElement>('[data-ba-range]');
+    if (!range) return;
+    const set = () => el.style.setProperty('--pos', range.value + '%');
+    range.addEventListener('input', set);
+    set();
+  });
+</script>
+
+<style>
+  .ba-case { margin: 0; }
+  .ba { --pos: 50%; position: relative; overflow: hidden; border-radius: var(--radius-lg); background: var(--sand); border: 1px solid var(--line); user-select: none; -webkit-user-select: none; }
+  .ba :global(picture), .ba :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; }
+  .ba__before { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+  .ba__tag { position: absolute; top: 12px; padding: 4px 12px; border-radius: 999px; background: rgba(20, 18, 14, .72); color: #fff; font-size: .82rem; font-weight: 500; pointer-events: none; }
+  .ba__tag--before { left: 12px; }
+  .ba__tag--after { right: 12px; background: var(--gold-500); color: var(--ink); }
+  .ba__handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 0 1px rgba(20, 18, 14, .25); pointer-events: none; }
+  .ba__handle span { position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: #fff; box-shadow: 0 6px 18px -6px rgba(20, 18, 14, .6); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237f5f2b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l-5 6 5 6M15 6l5 6-5 6'/%3E%3C/svg%3E"); background-size: 24px; background-position: center; background-repeat: no-repeat; }
+  .ba__range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+  .ba:has(.ba__range:focus-visible) { outline: 2px solid var(--gold-600); outline-offset: 3px; }
+  .ba-case figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; }
+  .ba-case__title { font-weight: 600; }
+  .ba-case__meta { color: var(--ink-3); font-size: .92rem; }
+  .ba-case figcaption p { flex-basis: 100%; margin: 0; color: var(--ink-2); font-size: .97rem; }
+</style>

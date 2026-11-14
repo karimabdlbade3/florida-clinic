@@ -1,0 +1,47 @@
+---
+import type { Branch, Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { t } from '../i18n/ui';
+import { localize, routes, telLink } from '../lib/urls';
+import Icon from './Icon.astro';
+interface Props { lang: Lang; branch: Branch; delay?: number }
+const { lang, branch: b, delay = 0 } = Astro.props;
+const d = t(lang);
+const isFirst = b.opened === Math.min(...branches.map((x) => x.opened));
+---
+<article class="card card--link branch-card reveal" data-delay={String(delay)}>
+  <div class="branch-card__top">
+    <span class="icon-badge"><Icon name="pin" /></span>
+    <span class="branch-card__tags">
+      {isFirst && <span class="tag">{d.branches.first}</span>}
+      {b.isMain && <span class="tag">{d.branches.main}</span>}
+    </span>
+  </div>
+  <h3><a class="stretched" href={localize(routes.branch(b.slug), lang)} style="text-decoration:none">{b.name[lang]}</a></h3>
+  <p class="branch-card__opened">{d.branches.opened(b.opened)}</p>
+  <p class="branch-card__loc">{b.locality[lang]}{lang === 'ar' ? '، ' : ', '}{b.region[lang]}</p>
+  <ul class="branch-card__meta">
+    <li><Icon name="pin" />{b.address ? b.address[lang] : <span class="ph">{d.placeholder.address}</span>}</li>
+    <li><Icon name="clock" />{b.hours ? <span>{b.hours[lang].join(lang === 'ar' ? '، ' : ' · ')}</span> : <span class="ph">{d.placeholder.hours}</span>}</li>
+    <li><Icon name="phone" />{b.phone ? <a class="branch-card__tel" href={telLink(b.phone)} dir="ltr" data-track="call_click">{b.phone}</a> : <span class="ph">{d.placeholder.phone}</span>}</li>
+  </ul>
+  <div class="branch-card__foot">
+    <span class="link-arrow" aria-hidden="true">{d.cta.viewBranch} <Icon name="arrow" class="flip" /></span>
+    {b.mapLink && <a class="branch-card__map" href={b.mapLink} target="_blank" rel="noopener" data-track="directions_click"><Icon name="pin" />{d.cta.directions}</a>}
+  </div>
+</article>
+
+<style>
+  .branch-card__top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .branch-card__tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+  .branch-card__opened { margin: 0 0 2px; color: var(--gold-700); font-weight: 500; font-size: .95rem; }
+  .branch-card__loc { margin-bottom: 18px; }
+  .branch-card__meta { list-style: none; display: grid; gap: 10px; margin-bottom: 24px; font-size: .95rem; color: var(--ink-2); }
+  .branch-card__meta li { display: flex; gap: 10px; align-items: flex-start; }
+  .branch-card__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+  .branch-card__map { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--gold-300); border-radius: 999px; font-size: .9rem; text-decoration: none; }
+  .branch-card__map:hover { background: var(--gold-200); color: var(--ink); }
+  .branch-card__map :global(svg) { width: 16px; height: 16px; margin: 0; color: var(--gold-600); }
+  .branch-card__tel { position: relative; z-index: 1; font-weight: 500; }
+  .branch-card__meta :global(svg) { width: 18px; height: 18px; margin-top: .35em; color: var(--gold-600); flex: none; }
+</style>

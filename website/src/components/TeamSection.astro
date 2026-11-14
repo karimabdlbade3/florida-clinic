@@ -1,0 +1,29 @@
+---
+/** Doctors / team. Renders nothing until approved entries exist in src/data/team.ts. */
+import type { Lang } from '../data/branches';
+import { team } from '../data/team';
+import { t } from '../i18n/ui';
+import PhotoSlot from './PhotoSlot.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+{team.length > 0 && (
+  <section class="section section--ivory" aria-labelledby="team-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">{d.home.teamEyebrow}</p>
+        <h2 id="team-title">{d.about.teamTitle}</h2>
+      </div>
+      <div class="grid grid--3">
+        {team.map((m, i) => (
+          <article class="card reveal" data-delay={String(i % 3)}>
+            {m.photo && <PhotoSlot src={m.photo} alt={m.name[lang]} ratio="1 / 1" />}
+            <h3 style="margin-top:18px">{m.name[lang]}</h3>
+            <p>{m.title[lang]}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

@@ -1,0 +1,19 @@
+---
+/**
+ * Optional sections that only exist when they have real content:
+ *   /cases/   - at least one consented before/after case
+ *   /reviews/ - at least one consented patient review
+ */
+import CasesView from '../../views/CasesView.astro';
+import ReviewsView from '../../views/ReviewsView.astro';
+import { cases } from '../../data/cases';
+import { testimonials } from '../../data/testimonials';
+export function getStaticPaths() {
+  return [
+    ...(cases.length > 0 ? [{ params: { section: 'cases' } }] : []),
+    ...(testimonials.length > 0 ? [{ params: { section: 'reviews' } }] : []),
+  ];
+}
+const { section } = Astro.params;
+---
+{section === 'cases' ? <CasesView lang="en" /> : <ReviewsView lang="en" />}

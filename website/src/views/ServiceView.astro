@@ -1,0 +1,160 @@
+---
+import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import type { Service } from '../data/services';
+import { services } from '../data/services';
+import { media } from '../data/media';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import PhotoSlot from '../components/PhotoSlot.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+
+interface Props { lang: Lang; service: Service }
+const { lang, service: s } = Astro.props;
+const d = t(lang);
+const S = d.services;
+const others = services.filter((x) => x.slug !== s.slug);
+const bookHref = `${localize(routes.contact, lang)}?service=${s.slug}#booking`;
+const waMsg = `${d.whatsappDefault} ${s.name[lang]}`;
+const pageUrl = new URL(localize(routes.service(s.slug), lang), Astro.site).href;
+
+const schema = [
+  {
+    '@type': 'MedicalWebPage',
+    name: s.name[lang],
+    url: pageUrl,
+    inLanguage: lang === 'ar' ? 'ar-EG' : 'en',
+    about: { '@type': 'MedicalProcedure', name: s.name[lang] },
+    audience: { '@type': 'Patient' },
+  },
+  {
+    '@type': 'FAQPage',
+    mainEntity: s.faq[lang].map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: d.breadcrumbHome, item: new URL(localize('/', lang), Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: S.title, item: new URL(localize(routes.services, lang), Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: s.name[lang], item: pageUrl },
+    ],
+  },
+];
+---
+<BaseLayout lang={lang} title={s.seo.title[lang]} description={s.seo.description[lang]} schema={schema} waMessage={waMsg}>
+  <PageHero lang={lang} title={s.name[lang]} lead={s.short[lang]} eyebrow={s.tagline[lang]} crumbs={[{ label: S.title, href: routes.services }, { label: s.name[lang] }]}>
+    <div class="btn-row" style="margin-top:28px">
+      <a class="btn" href={bookHref} data-track="book_click"><Icon name="calendar" />{d.cta.book}</a>
+      <a class="btn btn--outline" href="#faq">{S.faq}</a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container svc-intro">
+      <div class="reveal">
+        {s.intro[lang].map((p) => <p class="lead">{p}</p>)}
+        <p class="svc-avail"><Icon name="pin" />{S.availableAt}</p>
+      </div>
+      <div class="reveal" data-delay="1">
+        <PhotoSlot src={media.services[s.slug] ?? undefined} alt={`${s.name[lang]} - ${d.placeholder.photo}`} ratio="4 / 3" motif={s.icon === 'child' ? 'family' : s.icon === 'sparkle' ? 'smile' : 'tooth'} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--ivory">
+    <div class="container grid grid--2">
+      <article class="card reveal">
+        <h2 class="h3">{S.benefits}</h2>
+        <ul class="check-list">{s.benefits[lang].map((x) => <li>{x}</li>)}</ul>
+      </article>
+      <article class="card reveal" data-delay="1">
+        <h2 class="h3">{S.suitable}</h2>
+        <ul class="check-list">{s.suitableFor[lang].map((x) => <li>{x}</li>)}</ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container svc-split">
+      <div class="reveal">
+        <h2>{S.includes}</h2>
+        <ul class="dot-list svc-includes">{s.includes[lang].map((x) => <li>{x}</li>)}</ul>
+      </div>
+      <div class="reveal" data-delay="1">
+        <h2>{S.process}</h2>
+        <ol class="svc-steps">
+          {s.steps[lang].map((st, i) => (
+            <li><span class="svc-steps__n">{i + 1}</span><div><h3>{st.title}</h3><p>{st.text}</p></div></li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sand" id="faq" aria-labelledby="faq-title">
+    <div class="container faq">
+      <h2 id="faq-title" class="reveal">{S.faq}</h2>
+      <div class="faq__list">
+        {s.faq[lang].map((f, i) => (
+          <details class="faq__item reveal" data-delay={String(i)} open={i === 0}>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+      <p class="muted faq__note">{S.note}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="h3 reveal">{S.other}</h2>
+      <ul class="svc-others reveal">
+        {others.map((o) => <li><a href={localize(routes.service(o.slug), lang)}><Icon name={o.icon} />{o.name[lang]}</a></li>)}
+      </ul>
+      <h2 class="h3 reveal" style="margin-top:40px">{d.branches.title}</h2>
+      <ul class="svc-others reveal">
+        {branches.map((b) => <li><a href={`${localize(routes.contact, lang)}?branch=${b.slug}&service=${s.slug}#booking`} data-track="book_click"><Icon name="calendar" />{d.cta.book}: {b.name[lang]}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} title={S.ctaTitle} text={S.ctaText} bookHref={bookHref} waMessage={waMsg} />
+</BaseLayout>
+
+<style>
+  .h3 { font-size: clamp(1.3rem, 1.1rem + .7vw, 1.7rem); }
+  :global(html[lang='en']) .h3 { font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem); }
+  .svc-intro { display: grid; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  @media (min-width: 900px) { .svc-intro { grid-template-columns: 1.15fr .85fr; } }
+  .svc-avail { display: inline-flex; gap: 10px; align-items: center; color: var(--gold-700); font-weight: 500; }
+  .svc-avail :global(svg) { width: 20px; height: 20px; }
+  .svc-split { display: grid; gap: 56px; }
+  @media (min-width: 900px) { .svc-split { grid-template-columns: 1fr 1fr; gap: 72px; } }
+  .svc-includes { margin-top: 8px; }
+  .svc-includes li { padding-block: 6px; font-size: 1.05rem; }
+  .svc-steps { list-style: none; display: grid; gap: 0; margin-top: 8px; }
+  .svc-steps li { display: grid; grid-template-columns: auto 1fr; gap: 18px; padding-block: 18px; border-bottom: 1px solid var(--line); }
+  .svc-steps li:first-child { padding-top: 0; }
+  .svc-steps__n { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--gold-400); color: var(--gold-700); font-weight: 500; }
+  .svc-steps h3 { font-size: 1.15rem; margin-bottom: .15em; font-family: var(--font-sans); font-weight: 600; }
+  :global(html[lang='en']) .svc-steps h3 { font-size: 1.1rem; line-height: 1.4; letter-spacing: 0; }
+  .svc-steps p { margin: 0; color: var(--ink-2); }
+  .faq { max-width: 860px; }
+  .faq__list { display: grid; gap: 12px; margin-top: 24px; }
+  .faq__item { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 0 24px; }
+  .faq__item[open] { border-color: var(--gold-300); }
+  .faq__item summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 20px; cursor: pointer; font-weight: 500; font-size: 1.06rem; list-style: none; }
+  .faq__item summary::-webkit-details-marker { display: none; }
+  .faq__item summary::after { content: '+'; flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ivory); color: var(--gold-700); font-size: 1.2rem; transition: transform .25s; }
+  .faq__item[open] summary::after { transform: rotate(45deg); }
+  .faq__item p { color: var(--ink-2); padding-bottom: 20px; margin: 0; }
+  .faq__note { margin-top: 28px; font-size: .92rem; }
+  .svc-others { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
+  .svc-others a { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; }
+  .svc-others a:hover { border-color: var(--gold-400); background: var(--ivory); }
+  .svc-others :global(svg) { width: 18px; height: 18px; color: var(--gold-600); }
+</style>

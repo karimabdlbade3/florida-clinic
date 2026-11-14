@@ -1,0 +1,29 @@
+---
+/**
+ * Official Florida Dental Clinics logo.
+ * Files are generated from src/assets/brand/florida-logo-original.png by
+ * `node scripts/make-brand-assets.mjs` (crop + resize only, artwork untouched).
+ * To update the logo: replace the original file and re-run that script.
+ */
+import type { Lang } from '../data/branches';
+import { site } from '../config/site';
+interface Props { lang: Lang; size?: 'header' | 'footer' }
+const { lang, size = 'header' } = Astro.props;
+---
+<span class:list={['logo', `logo--${size}`]}>
+  <img class="logo__mark" src="/brand/logo-mark.webp" alt="" width="192" height="192" decoding="async" />
+  <img class="logo__word" src="/brand/logo-wordmark.webp" alt={site.brand[lang]} width="499" height="132" decoding="async" />
+</span>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 10px; direction: ltr; }
+  .logo__mark { width: 46px; height: 46px; flex: none; }
+  .logo__word { height: 38px; width: auto; }
+  .logo--footer .logo__mark { width: 56px; height: 56px; }
+  .logo--footer .logo__word { height: 46px; }
+  @media (max-width: 520px) {
+    .logo { gap: 7px; }
+    .logo--header .logo__mark { width: 36px; height: 36px; }
+    .logo--header .logo__word { height: 29px; }
+  }
+</style>

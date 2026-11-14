@@ -1,0 +1,147 @@
+---
+import type { Branch, Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { services } from '../data/services';
+import { site } from '../config/site';
+import { media } from '../data/media';
+import { t } from '../i18n/ui';
+import { localize, routes, whatsappLink, telLink } from '../lib/urls';
+import { branchSchema } from '../lib/schema';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import PhotoSlot from '../components/PhotoSlot.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+
+interface Props { lang: Lang; branch: Branch }
+const { lang, branch: b } = Astro.props;
+const d = t(lang);
+const B = d.branches;
+const isFirst = b.opened === Math.min(...branches.map((x) => x.opened));
+const waMsg = `${d.whatsappDefault} ${b.name[lang]}`;
+const wa = whatsappLink(waMsg, b.whatsapp);
+const tel = telLink(b.phone);
+const bookHref = `${localize(routes.contact, lang)}?branch=${b.slug}#booking`;
+const others = branches.filter((x) => x.slug !== b.slug);
+const mapOk = b.mapEmbedUrl && /^https:\/\/www\.google\.com\/maps\/embed\?/.test(b.mapEmbedUrl);
+
+const schema = [
+  branchSchema(b, lang, Astro.site!),
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: d.breadcrumbHome, item: new URL(localize('/', lang), Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: B.title, item: new URL(localize(routes.branches, lang), Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: b.name[lang], item: new URL(localize(routes.branch(b.slug), lang), Astro.site).href },
+    ],
+  },
+];
+---
+<BaseLayout lang={lang} title={b.seo.title[lang]} description={b.seo.description[lang]} schema={schema} waMessage={waMsg}>
+  <PageHero lang={lang} title={b.name[lang]} lead={b.intro[lang]} eyebrow={[B.opened(b.opened), isFirst && B.first, b.isMain && B.main].filter(Boolean).join(' · ')} crumbs={[{ label: B.title, href: routes.branches }, { label: b.name[lang] }]}>
+    <div class="btn-row" style="margin-top:28px">
+      <a class="btn" href={bookHref} data-track="book_click"><Icon name="calendar" />{d.cta.bookHere}</a>
+      {wa && <a class="btn btn--outline" href={wa} target="_blank" rel="noopener" data-track="whatsapp_click"><Icon name="whatsapp" />{d.cta.bookWhatsapp}</a>}
+      {tel && <a class="btn btn--outline" href={tel} data-track="call_click"><Icon name="phone" />{d.cta.callBranch}</a>}
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container branch">
+      <div class="branch__info">
+        <div class="info-row reveal">
+          <span class="icon-badge"><Icon name="pin" /></span>
+          <div>
+            <h2 class="info-row__title">{B.address}</h2>
+            <p>{b.address ? b.address[lang] : <span class="ph">{d.placeholder.address}</span>}</p>
+            {b.address && lang !== 'ar' && <p class="muted" lang="ar" dir="rtl">{b.address.ar}</p>}
+            {b.landmark && <p class="muted">{b.landmark[lang]}</p>}
+            <p class="muted">{b.locality[lang]}{lang === 'ar' ? '، ' : ', '}{b.region[lang]}</p>
+            {b.mapLink && <p><a class="link-arrow" href={b.mapLink} target="_blank" rel="noopener" data-track="directions_click">{d.cta.directions} <Icon name="arrow" class="flip" /></a></p>}
+          </div>
+        </div>
+        <div class="info-row reveal">
+          <span class="icon-badge"><Icon name="phone" /></span>
+          <div>
+            <h2 class="info-row__title">{B.contact}</h2>
+            {b.phone ? <p><span class="muted">{B.phoneLabel}: </span><a class="tel" href={tel!} dir="ltr" data-track="call_click">{b.phone}</a></p> : <p><span class="ph">{d.placeholder.phone}</span></p>}
+            {wa && <p><span class="muted">{b.whatsapp ? d.cta.whatsapp : B.bookingWa}: </span><a href={wa} target="_blank" rel="noopener" data-track="whatsapp_click">{d.cta.bookWhatsapp}</a></p>}
+          </div>
+        </div>
+        <div class="info-row reveal">
+          <span class="icon-badge"><Icon name="clock" /></span>
+          <div>
+            <h2 class="info-row__title">{B.hours}</h2>
+            {b.hours ? <ul class="hours">{b.hours[lang].map((h) => <li>{h}</li>)}</ul> : <p><span class="ph">{d.placeholder.hours}</span></p>}
+            {b.hours && <p class="muted">{site.hours.note[lang]}</p>}
+          </div>
+        </div>
+      </div>
+
+      <div class="branch__map reveal" data-delay="1">
+        <h2 class="sr-only">{B.map}</h2>
+        {mapOk ? (
+          <iframe src={b.mapEmbedUrl!} title={B.mapTitle(b.name[lang])} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        ) : (
+          <div class="map-ph">
+            <PhotoSlot src={media.branches[b.slug] ?? undefined} alt={b.mapLink ? B.mapTitle(b.name[lang]) : d.placeholder.map} ratio="4 / 3" motif="map" />
+            {b.mapLink ? (
+              <div class="map-ph__cta">
+                <a class="btn" href={b.mapLink} target="_blank" rel="noopener" data-track="directions_click"><Icon name="pin" />{d.cta.openMap}</a>
+              </div>
+            ) : (
+              <p class="map-ph__text"><span class="ph">{d.placeholder.map}</span></p>
+            )}
+          </div>
+        )}
+        {b.mapLink && !mapOk && <p class="muted" style="margin-top:14px;font-size:.92rem">{B.mapNote}</p>}
+        {b.mapLink && mapOk && <a class="link-arrow" style="margin-top:16px" href={b.mapLink} target="_blank" rel="noopener" data-track="directions_click">{d.cta.directions} <Icon name="arrow" class="flip" /></a>}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--ivory" aria-labelledby="branch-services">
+    <div class="container">
+      <h2 id="branch-services" class="reveal">{B.services}</h2>
+      <ul class="svc-chips reveal">
+        {services.map((s) => (
+          <li><a href={localize(routes.service(s.slug), lang)}><Icon name={s.icon} />{s.name[lang]}</a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="reveal">{B.otherBranches}</h2>
+      <ul class="svc-chips reveal">
+        {others.map((o) => <li><a href={localize(routes.branch(o.slug), lang)}><Icon name="pin" />{o.name[lang]}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} bookHref={bookHref} waMessage={waMsg} waNumber={b.whatsapp} />
+</BaseLayout>
+
+<style>
+  .branch { display: grid; gap: 48px; }
+  @media (min-width: 960px) { .branch { grid-template-columns: .9fr 1.1fr; gap: 64px; } }
+  .branch__info { display: grid; gap: 8px; }
+  .info-row { display: grid; grid-template-columns: auto 1fr; gap: 18px; padding-block: 22px; border-bottom: 1px solid var(--line); }
+  .info-row .icon-badge { margin: 0; width: 48px; height: 48px; }
+  .info-row p { margin: 0 0 4px; }
+  .info-row__title { font-family: var(--font-sans); font-size: .85rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-700); margin-bottom: 6px; line-height: 1.5; }
+  :global(html[lang='ar']) .info-row__title { letter-spacing: 0; font-size: .95rem; }
+  .hours { list-style: none; }
+  .branch__map iframe { width: 100%; aspect-ratio: 4 / 3; border: 0; border-radius: var(--radius-lg); background: var(--sand); }
+  .map-ph { position: relative; }
+  .map-ph__text { position: absolute; inset-inline: 16px; bottom: 16px; margin: 0; text-align: center; }
+  .map-ph__text .ph { background: rgba(255,255,255,.9); }
+  .map-ph__cta { position: absolute; inset-inline: 16px; bottom: 20px; display: flex; justify-content: center; }
+  .map-ph__cta .btn { white-space: normal; text-align: center; box-shadow: var(--shadow); }
+  .tel { font-weight: 600; font-size: 1.1rem; }
+  .svc-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .svc-chips a { display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; background: var(--white); border: 1px solid var(--line); border-radius: 999px; text-decoration: none; }
+  .svc-chips a:hover { border-color: var(--gold-400); }
+  .svc-chips :global(svg) { width: 20px; height: 20px; color: var(--gold-600); }
+</style>

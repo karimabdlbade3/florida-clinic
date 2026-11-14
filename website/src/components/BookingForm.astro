@@ -1,0 +1,142 @@
+---
+/**
+ * Appointment REQUEST form (never claims a confirmed booking).
+ * Delivery order:
+ *   1. PUBLIC_BOOKING_ENDPOINT set  -> POST JSON to the appointment system
+ *   2. WhatsApp number available    -> opens WhatsApp with a pre-filled message
+ *   3. Neither                      -> form disabled with an honest notice
+ */
+import type { Lang } from '../data/branches';
+import { branches } from '../data/branches';
+import { services } from '../data/services';
+import { site, safeBookingEndpoint, toIntlEgypt } from '../config/site';
+import { t } from '../i18n/ui';
+import { localize, routes } from '../lib/urls';
+import Icon from './Icon.astro';
+
+interface Props { lang: Lang; presetBranch?: string; presetService?: string; compact?: boolean }
+const { lang, presetBranch, presetService } = Astro.props;
+const d = t(lang);
+const f = d.form;
+
+const branchTargets = Object.fromEntries(branches.map((b) => [b.slug, toIntlEgypt(b.whatsapp) ?? site.contact.whatsapp]));
+const mode = safeBookingEndpoint ? 'endpoint' : Object.values(branchTargets).some(Boolean) ? 'whatsapp' : 'none';
+
+const config = {
+  lang,
+  mode,
+  endpoint: safeBookingEndpoint,
+  targets: branchTargets,
+  labels: {
+    branches: Object.fromEntries(branches.map((b) => [b.slug, b.name[lang]])),
+    services: { ...Object.fromEntries(services.map((s) => [s.slug, s.name[lang]])), unsure: f.serviceUnsure },
+    times: f.times,
+    fields: f.waFields,
+    intro: f.waIntro,
+    footer: f.waFooter,
+  },
+  messages: {
+    errors: f.errors,
+    sending: f.sending,
+    successEndpoint: f.successEndpoint,
+    successWhatsapp: f.successWhatsapp,
+    popupBlocked: f.popupBlocked,
+    openWhatsapp: f.openWhatsapp,
+    errorEndpoint: f.errorEndpoint,
+    notConfigured: f.notConfigured,
+  },
+};
+const submitLabel = mode === 'whatsapp' ? f.submitWhatsapp : f.submit;
+---
+<form class="booking" novalidate data-booking-form data-mode={mode} aria-describedby="booking-note">
+  <script type="application/json" data-booking-config set:html={JSON.stringify(config).replace(/</g, '\\u003c')} />
+
+  <p class="booking__note" id="booking-note"><Icon name="shield" />{d.contact.formNote}</p>
+
+  <div class="booking__grid">
+    <div class="field">
+      <label for="bk-name">{f.name} <span class="req" aria-hidden="true">*</span></label>
+      <input class="input" id="bk-name" name="name" type="text" autocomplete="name" maxlength="80" required placeholder={f.namePh} aria-describedby="bk-name-err" />
+      <p class="error" id="bk-name-err" data-error-for="name"></p>
+    </div>
+
+    <div class="field">
+      <label for="bk-phone">{f.phone} <span class="req" aria-hidden="true">*</span></label>
+      <input class="input" id="bk-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" required placeholder={f.phonePh} aria-describedby="bk-phone-hint bk-phone-err" dir="ltr" />
+      <p class="hint" id="bk-phone-hint">{f.phoneHint}</p>
+      <p class="error" id="bk-phone-err" data-error-for="phone"></p>
+    </div>
+
+    <div class="field">
+      <label for="bk-branch">{f.branch} <span class="req" aria-hidden="true">*</span></label>
+      <select class="select" id="bk-branch" name="branch" required aria-describedby="bk-branch-err">
+        <option value="">{f.choose}</option>
+        {branches.map((b) => <option value={b.slug} selected={presetBranch === b.slug}>{b.name[lang]}</option>)}
+      </select>
+      <p class="error" id="bk-branch-err" data-error-for="branch"></p>
+    </div>
+
+    <div class="field">
+      <label for="bk-service">{f.service} <span class="req" aria-hidden="true">*</span></label>
+      <select class="select" id="bk-service" name="service" required aria-describedby="bk-service-err">
+        <option value="">{f.choose}</option>
+        {services.map((s) => <option value={s.slug} selected={presetService === s.slug}>{s.name[lang]}</option>)}
+        <option value="unsure">{f.serviceUnsure}</option>
+      </select>
+      <p class="error" id="bk-service-err" data-error-for="service"></p>
+    </div>
+
+    <div class="field">
+      <label for="bk-date">{f.date}</label>
+      <input class="input" id="bk-date" name="date" type="date" aria-describedby="bk-date-err" />
+      <p class="error" id="bk-date-err" data-error-for="date"></p>
+    </div>
+
+    <div class="field">
+      <label for="bk-time">{f.time}</label>
+      <select class="select" id="bk-time" name="time">
+        {Object.entries(f.times).map(([k, v]) => <option value={k}>{v}</option>)}
+      </select>
+    </div>
+
+    <div class="field booking__full">
+      <label for="bk-notes">{f.notes}</label>
+      <textarea class="textarea" id="bk-notes" name="notes" maxlength="400" placeholder={f.notesPh} aria-describedby="bk-notes-hint"></textarea>
+      <p class="hint" id="bk-notes-hint">{f.notesHint}</p>
+    </div>
+
+    <div class="hp" aria-hidden="true">
+      <label for="bk-website">Website</label>
+      <input id="bk-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="field booking__full">
+      <label class="checkbox" for="bk-consent">
+        <input id="bk-consent" name="consent" type="checkbox" required aria-describedby="bk-consent-err" />
+        <span>{f.consent} <a href={localize(routes.privacy, lang)}>{f.privacyLink}</a></span>
+      </label>
+      <p class="error" id="bk-consent-err" data-error-for="consent"></p>
+    </div>
+  </div>
+
+  <div class="form-status" role="status" aria-live="polite" data-form-status data-state={mode === 'none' ? 'info' : undefined}>{mode === 'none' ? f.notConfigured : ''}</div>
+
+  <button class="btn btn--block booking__submit" type="submit" disabled={mode === 'none'} data-submit>
+    <Icon name={mode === 'whatsapp' ? 'whatsapp' : 'calendar'} />
+    <span data-submit-label>{submitLabel}</span>
+  </button>
+</form>
+
+<script>
+  import { initBookingForms } from '../scripts/booking';
+  initBookingForms();
+</script>
+
+<style>
+  .booking { position: relative; display: grid; gap: 22px; }
+  .booking__note { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 14px 16px; border-radius: 12px; background: var(--ivory); border: 1px solid var(--gold-200); color: var(--ink-2); font-size: .95rem; }
+  .booking__note :global(svg) { width: 20px; height: 20px; margin-top: .3em; color: var(--gold-600); flex: none; }
+  .booking__grid { display: grid; gap: 18px; align-items: start; }
+  @media (min-width: 640px) { .booking__grid { grid-template-columns: 1fr 1fr; } .booking__full { grid-column: 1 / -1; } }
+  .booking__submit { min-height: 56px; font-size: 1.05rem; }
+</style>

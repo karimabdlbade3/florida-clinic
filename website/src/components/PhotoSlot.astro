@@ -1,0 +1,80 @@
+---
+/**
+ * Image slot. Pass a real photo (imported from src/assets/photos) via `src`
+ * and Astro will output optimised, responsive WebP/AVIF with width/height.
+ * Without `src`, a designed placeholder composition is rendered so the layout
+ * stays intact until real clinic photography is available.
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src?: ImageMetadata;
+  alt: string;
+  ratio?: string; // CSS aspect-ratio, e.g. "4 / 5"
+  shape?: 'arch' | 'rounded';
+  motif?: 'smile' | 'tooth' | 'chair' | 'family' | 'map';
+  sizes?: string;
+  loading?: 'eager' | 'lazy';
+  class?: string;
+}
+const { src, alt, ratio = '4 / 5', shape = 'rounded', motif = 'tooth', sizes = '(min-width: 1024px) 560px, 100vw', loading = 'lazy', class: cls } = Astro.props;
+// unique gradient id per slot (avoids duplicate ids on one page)
+const gid = 'phg-' + [...(alt + motif + ratio)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7).toString(36);
+---
+<figure class:list={['photo', `photo--${shape}`, cls]} style={`aspect-ratio:${ratio}`} data-photo-slot={src ? 'filled' : 'empty'}>
+  {src ? (
+    <Picture src={src} alt={alt} formats={['avif', 'webp']} widths={[480, 800, 1200]} sizes={sizes} loading={loading} fetchpriority={loading === 'eager' ? 'high' : undefined} />
+  ) : (
+    <div class="photo__ph" aria-hidden="true">
+      <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f6efe2" />
+            <stop offset=".55" stop-color="#efe3c9" />
+            <stop offset="1" stop-color="#e2cc9f" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="500" fill={`url(#${gid})`} />
+        <g fill="none" stroke="#b8955a" stroke-width="1.2" opacity=".55">
+          <circle cx="330" cy="70" r="120" />
+          <circle cx="330" cy="70" r="170" opacity=".5" />
+          <circle cx="60" cy="470" r="140" opacity=".6" />
+        </g>
+        {motif === 'smile' && (
+          <g fill="none" stroke="#9d7a42" stroke-width="2" stroke-linecap="round" opacity=".7">
+            <path d="M110 250c40 60 140 60 180 0" />
+            <path d="M130 262c35 30 105 30 140 0" opacity=".5" />
+          </g>
+        )}
+        {motif === 'tooth' && (
+          <path transform="translate(140 170) scale(5)" fill="none" stroke="#9d7a42" stroke-width=".45" stroke-linejoin="round" opacity=".75" d="M7.5 3.5c-2.5 0-4 2-4 4.6 0 2.2.9 3.7 1.4 5.6.6 2.4.7 7.3 2.6 7.3 1.7 0 1.6-4.6 3-5.6.4-.3.6-.4 1.5-.4s1.1.1 1.5.4c1.4 1 1.3 5.6 3 5.6 1.9 0 2-4.9 2.6-7.3.5-1.9 1.4-3.4 1.4-5.6 0-2.6-1.5-4.6-4-4.6-1.9 0-2.7 1.1-4.5 1.1S9.4 3.5 7.5 3.5z" />
+        )}
+        {motif === 'chair' && (
+          <g fill="none" stroke="#9d7a42" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".7">
+            <path d="M120 320h150l40-60M150 320l-20-110c-3-16 22-22 28-6l26 76h70" />
+            <path d="M200 320v50M160 370h80" />
+          </g>
+        )}
+        {motif === 'family' && (
+          <g fill="none" stroke="#9d7a42" stroke-width="2" opacity=".7">
+            <circle cx="160" cy="220" r="26" /><circle cx="245" cy="220" r="26" /><circle cx="203" cy="270" r="18" />
+            <path d="M110 340c8-50 92-50 100 0M195 340c8-50 92-50 100 0M170 360c6-34 60-34 66 0" />
+          </g>
+        )}
+        {motif === 'map' && (
+          <g fill="none" stroke="#9d7a42" stroke-width="2" opacity=".7">
+            <path d="M200 340s-56-50-56-92a56 56 0 0 1 112 0c0 42-56 92-56 92z" /><circle cx="200" cy="248" r="18" />
+          </g>
+        )}
+      </svg>
+    </div>
+  )}
+</figure>
+
+<style>
+  .photo { position: relative; margin: 0; overflow: hidden; background: var(--sand); }
+  .photo--rounded { border-radius: var(--radius-lg); }
+  .photo--arch { border-radius: 999px 999px var(--radius-lg) var(--radius-lg); }
+  .photo :global(img), .photo__ph, .photo__ph svg { width: 100%; height: 100%; object-fit: cover; }
+</style>
