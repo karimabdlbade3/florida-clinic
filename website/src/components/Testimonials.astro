@@ -6,6 +6,7 @@
 import type { Lang } from '../data/branches';
 import { testimonials } from '../data/testimonials';
 import { services } from '../data/services';
+import { branches } from '../data/branches';
 import { t } from '../i18n/ui';
 import { localize, routes } from '../lib/urls';
 import Icon from './Icon.astro';
@@ -15,6 +16,7 @@ const d = t(lang).reviews;
 const all = [...testimonials.filter((x) => x.lang === lang), ...testimonials.filter((x) => x.lang !== lang)];
 const list = page ? all : all.slice(0, limit);
 const serviceName = (slug?: string) => services.find((s) => s.slug === slug)?.name[lang];
+const branchName = (slug?: string) => branches.find((b) => b.slug === slug)?.name[lang];
 const fmtDate = (v?: string) => {
   if (!v) return null;
   const dt = new Date(v.length === 7 ? v + '-01' : v);
@@ -39,7 +41,7 @@ const fmtDate = (v?: string) => {
             <blockquote lang={x.lang} dir={x.lang === 'ar' ? 'rtl' : 'ltr'}><p>{x.quote}</p></blockquote>
             <figcaption>
               <span class="review__name">{x.name ?? d.anonymous}</span>
-              <span class="review__meta">{[serviceName(x.service), fmtDate(x.date)].filter(Boolean).join(' · ')}</span>
+              <span class="review__meta">{[serviceName(x.service), branchName(x.branch), fmtDate(x.date)].filter(Boolean).join(' · ')}</span>
             </figcaption>
           </figure>
         ))}
@@ -57,7 +59,7 @@ const fmtDate = (v?: string) => {
   .review__stars { margin: 0 0 10px; color: var(--gold-500); letter-spacing: 2px; }
   .review__stars span { color: var(--line); }
   .review blockquote { margin: 0 0 20px; flex: 1; }
-  .review blockquote p { color: var(--ink); font-size: 1.05rem; margin: 0; }
+  .review blockquote p { color: var(--ink); font-size: 1.02rem; margin: 0; white-space: pre-line; }
   .review figcaption { display: grid; gap: 2px; padding-top: 16px; border-top: 1px solid var(--line); }
   .review__name { font-weight: 600; }
   .review__meta { color: var(--ink-3); font-size: .9rem; }

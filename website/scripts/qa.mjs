@@ -62,7 +62,7 @@ const browser = await chromium.launch();
   const base = 'http://localhost:4401';
   const pages = pagesOf(dir);
   console.log(`A) ${pages.length} pages, WhatsApp switched off`);
-  ok('page count (2 langs x 18)', pages.length === 36, String(pages.length));
+  ok('page count (2 langs x 19)', pages.length === 38, String(pages.length));
   const ctx = await browser.newContext();
   const linkSet = new Set();
   for (const path of pages) {
@@ -119,7 +119,7 @@ const browser = await chromium.launch();
     ok(`${f} exists`, (await fetch(base + f)).status === 200);
   }
   const sm = await (await fetch(base + '/sitemap-0.xml')).text();
-  ok('sitemap has 36 URLs', (sm.match(/<loc>/g) || []).length === 36, String((sm.match(/<loc>/g) || []).length));
+  ok('sitemap has 38 URLs', (sm.match(/<loc>/g) || []).length === 38, String((sm.match(/<loc>/g) || []).length));
   ok('sitemap excludes 404', !sm.includes('404'));
   // language switch
   const p = await ctx.newPage();
@@ -344,6 +344,15 @@ const browser = await chromium.launch();
         ok(`${lang} service page ${slug} loads with booking link`, r.status() === 200 && (await page.$(`a[href*="service=${slug}"]`)) !== null);
       }
     }
+    // Orthodontics lists clear aligners alongside the existing metal and aesthetic options
+    for (const [pre, words] of [['', ['التقويم الشفاف', 'التقويم المعدني أو التجميلي']], ['/en', ['Clear aligners', 'Metal or aesthetic braces']]]) {
+      await page.goto(base + pre + '/services/orthodontics/');
+      const ortho = await page.textContent('main');
+      const desc = await page.getAttribute('meta[name=description]', 'content');
+      ok(`${pre || '/ar'} orthodontics page lists clear aligners and keeps metal/aesthetic braces`, words.every((w) => ortho.includes(w)) && /شفاف|clear aligners/i.test(desc), desc);
+      await page.goto(base + pre + '/services/');
+      ok(`${pre || '/ar'} orthodontics card mentions clear aligners`, /الشفاف|clear aligners/i.test(await page.textContent('[data-main-services] .svc-card')));
+    }
     // Existing content preserved, not deleted
     await page.goto(base + '/services/general-dentistry/');
     let txt = await page.textContent('main');
@@ -419,8 +428,23 @@ const browser = await chromium.launch();
       ok(`${lang} nav + footer link to the gallery`, (await page.$(`#site-nav a[href="${pre}/cases/"][aria-current="page"]`)) !== null && (await page.$(`.site-footer a[href="${pre}/cases/"]`)) !== null);
       await page.goto(base + pre + '/', { waitUntil: 'networkidle' });
       ok(`${lang} home: before/after section with link to all cases`, (await page.$$('[data-home-cases] [data-case]')).length === 2 && (await page.$(`section[aria-labelledby="cases-title"] a.btn[href="${pre}/cases/"]`)) !== null);
-      ok(`${lang} home: reviews section hidden while there are no real reviews`, (await page.$('#reviews-title')) === null && (await page.$(`a[href="${pre}/reviews/"]`)) === null);
-      ok(`${lang} reviews page does not exist without real reviews`, (await fetch(base + pre + '/reviews/')).status === 404);
+      // Patient reviews: genuine entries only, first name + initial, verbatim rating
+      const homeReviews = await page.$$eval('#reviews-title ~ [data-reviews] .review, section[aria-labelledby="reviews-title"] .review', (els) => els.length);
+      ok(`${lang} home: reviews section shows three reviews with link to all`, homeReviews === 3 && (await page.$(`section[aria-labelledby="reviews-title"] a.btn[href="${pre}/reviews/"]`)) !== null, String(homeReviews));
+      await page.goto(base + pre + '/reviews/', { waitUntil: 'networkidle' });
+      const rv = await page.$$eval('[data-reviews] .review', (els) => els.map((e) => ({
+        name: e.querySelector('.review__name').textContent.trim(),
+        stars: e.querySelector('.review__stars')?.getAttribute('aria-label') || '',
+        gold: (e.querySelector('.review__stars')?.childNodes[0]?.textContent || '').length,
+        quoteLang: e.querySelector('blockquote').getAttribute('lang'),
+        len: e.querySelector('blockquote').textContent.trim().length,
+        meta: e.querySelector('.review__meta').textContent.trim(),
+      })));
+      ok(`${lang} reviews page: five genuine reviews`, rv.length === 5, String(rv.length));
+      ok(`${lang} reviews page: ratings exactly as given (5,5,4,5,5)`, JSON.stringify(rv.map((r) => r.gold)) === '[5,5,4,5,5]', JSON.stringify(rv.map((r) => r.gold)));
+      ok(`${lang} reviews page: display names are first name + initial only`, rv.every((r) => /^\S+( \S+)? \S\.$/.test(r.name)), JSON.stringify(rv.map((r) => r.name)));
+      ok(`${lang} reviews page: Arabic text kept in Arabic with branch and date`, rv.every((r) => r.quoteLang === 'ar' && r.len > 60 && r.meta.includes('·')));
+      ok(`${lang} nav + footer link to reviews`, (await page.$(`#site-nav a[href="${pre}/reviews/"][aria-current="page"]`)) !== null && (await page.$(`.site-footer a[href="${pre}/reviews/"]`)) !== null);
     }
     // touch
     const mob = await browser.newContext(devices['iPhone 13']);
@@ -500,7 +524,7 @@ const browser = await chromium.launch();
       shown += r.shown;
       ok(`${path} every displayed phone number is a tappable tel: link`, r.bad.length === 0, JSON.stringify(r.bad));
     }
-    ok('phone numbers are displayed across the site', shown >= 36 * 3, String(shown));
+    ok('phone numbers are displayed across the site', shown >= 38 * 3, String(shown));
     await mob.close();
   }
   // No unfinished placeholders anywhere in the production build, no layout overflow
@@ -513,12 +537,12 @@ const browser = await chromium.launch();
       oldSpelling: document.documentElement.outerHTML.includes('كفر نجم'),
       broken: [...document.images].filter((i) => i.complete && i.naturalWidth === 0).length,
       logo: !!document.querySelector('.site-header img[src="/brand/logo-wordmark.webp"]'),
-      fakeReviews: document.querySelectorAll('.quote, .review, [data-reviews]').length,
+      fakeReviews: document.querySelectorAll('.review').length > 5 || /وحيد محمد|القناوي|السيد مكرم|السيد محمد|احمد عرفات|\b1(54|56|96)\.\d+\.\d+\.\d+/.test(document.documentElement.outerHTML) ? 1 : 0,
     }));
     ok(`${path} no visible placeholders`, r.ph === 0 && !r.brackets && !r.waiting, JSON.stringify(r));
     ok(`${path} Kafr Negm spelled كفورنجم only`, !r.oldSpelling);
     ok(`${path} no broken images, official logo present`, r.broken === 0 && r.logo, JSON.stringify(r));
-    ok(`${path} no testimonials without real data`, r.fakeReviews === 0);
+    ok(`${path} only the genuine reviews, no patient full names or IP addresses`, r.fakeReviews === 0);
   }
   for (const w of [320, 375, 390, 768, 1024, 1440]) {
     const vp = await ctx.newPage();

@@ -34,8 +34,8 @@ export const services: Service[] = [
     name: { ar: 'تقويم الأسنان', en: 'Orthodontics' },
     tagline: { ar: 'أسنان منتظمة وعضّة متوازنة', en: 'Straighter teeth, a balanced bite' },
     short: {
-      ar: 'علاج ازدحام الأسنان والفراغات ومشاكل العضّة للأطفال والكبار، بخطة واضحة ومتابعة منتظمة.',
-      en: 'Treatment for crowding, gaps and bite problems for children and adults, with a clear plan and regular follow-up.',
+      ar: 'علاج ازدحام الأسنان والفراغات ومشاكل العضّة للأطفال والكبار، بالتقويم المعدني أو التجميلي أو الشفاف، بخطة واضحة ومتابعة منتظمة.',
+      en: 'Treatment for crowding, gaps and bite problems for children and adults, with metal braces, aesthetic braces or clear aligners, a clear plan and regular follow-up.',
     },
     intro: {
       ar: [
@@ -56,8 +56,8 @@ export const services: Service[] = [
       en: ['Crowded or overlapping teeth', 'Gaps between teeth', 'Protruding front teeth or a deep bite', 'Crossbite or open bite', 'Children whose jaws are still growing, after assessment'],
     },
     includes: {
-      ar: ['فحص وتقييم شامل للأسنان والفكين', 'التقويم المعدني أو التجميلي حسب ملاءمة الحالة', 'أجهزة التقويم المتحركة للأطفال عند الحاجة', 'المثبّتات بعد انتهاء العلاج للحفاظ على النتيجة'],
-      en: ['Full assessment of teeth and jaws', 'Metal or aesthetic braces, depending on suitability', 'Removable appliances for children when needed', 'Retainers after treatment to help keep the result'],
+      ar: ['فحص وتقييم شامل للأسنان والفكين', 'التقويم المعدني أو التجميلي حسب ملاءمة الحالة', 'التقويم الشفاف (Clear Aligners) حسب ملاءمة الحالة', 'أجهزة التقويم المتحركة للأطفال عند الحاجة', 'المثبّتات بعد انتهاء العلاج للحفاظ على النتيجة'],
+      en: ['Full assessment of teeth and jaws', 'Metal or aesthetic braces, depending on suitability', 'Clear aligners, depending on suitability', 'Removable appliances for children when needed', 'Retainers after treatment to help keep the result'],
     },
     steps: {
       ar: [
@@ -88,8 +88,8 @@ export const services: Service[] = [
     seo: {
       title: { ar: 'تقويم الأسنان في كفورنجم والإبراهيمية والزقازيق | عيادات فلوريدا', en: 'Orthodontics & Braces in Kafr Negm, Ibrahimia, Zagazig | Florida Dental' },
       description: {
-        ar: 'تقويم الأسنان للأطفال والكبار في عيادات فلوريدا: علاج الازدحام والفراغات ومشاكل العضّة بخطة واضحة. اطلب موعد الكشف في أقرب فرع.',
-        en: 'Orthodontic treatment for children and adults at Florida Dental Clinics: crowding, gaps and bite problems, with a clear plan. Request a consultation at your nearest branch.',
+        ar: 'تقويم الأسنان للأطفال والكبار في عيادات فلوريدا: تقويم معدني وتجميلي وشفاف لعلاج الازدحام والفراغات ومشاكل العضّة. اطلب موعد الكشف في أقرب فرع.',
+        en: 'Orthodontics for children and adults at Florida Dental Clinics: metal braces, aesthetic braces and clear aligners for crowding, gaps and bite problems.',
       },
     },
   },

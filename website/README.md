@@ -5,7 +5,7 @@ for Florida Dental Clinics: Kafr Negm, Ibrahimia (main) and Zagazig.
 
 - **Stack:** [Astro 7](https://astro.build) static site, no UI framework, about 2 KB of JavaScript on most pages (about 6 KB on the booking page).
 - **Output:** plain HTML/CSS/JS in `dist/`. It runs on any static host, with no server or database.
-- **Pages (36):** Home, About, Services + 8 service pages (the seven official categories plus general care), Before & After gallery, Branches + 3 branch pages, Contact & Booking, Privacy, in Arabic (`/`) and English (`/en/`), plus a 404 page.
+- **Pages (38):** Home, About, Services + 8 service pages (the seven official categories plus general care), Before & After gallery, Patient reviews, Branches + 3 branch pages, Contact & Booking, Privacy, in Arabic (`/`) and English (`/en/`), plus a 404 page.
 
 ## Run locally
 
@@ -178,7 +178,7 @@ Organization, Dentist per branch (only verified fields), MedicalWebPage, FAQPage
 
 ## QA status (at handover)
 
-- `npm run test:e2e`: 1080/1080 checks pass: official business data (phones, maps, hours, WhatsApp, social links,
+- `npm run test:e2e`: 1130/1130 checks pass: official business data (phones, maps, hours, WhatsApp, social links,
   branch schema) in both languages, all 30 pages, no visible placeholders, no broken images, form validation and
   WhatsApp hand-off with every field preserved, endpoint success/failure, 404, sitemap, and no horizontal overflow
   at 320 / 375 / 390 / 768 / 1024 / 1440 px, the seven service categories in official order, navigation menus,
