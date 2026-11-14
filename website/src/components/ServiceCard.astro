@@ -10,13 +10,13 @@ import { media } from '../data/media';
 import { t } from '../i18n/ui';
 import { localize, routes } from '../lib/urls';
 import Icon from './Icon.astro';
-interface Props { lang: Lang; service: Service; number?: number; delay?: number }
-const { lang, service, number, delay = 0 } = Astro.props;
+interface Props { lang: Lang; service: Service; number?: number; delay?: number; eager?: boolean }
+const { lang, service, number, delay = 0, eager = false } = Astro.props;
 const d = t(lang);
 const img = media.services[service.slug];
 ---
 <article class="svc-card reveal" data-delay={String(delay % 4)}>
-  {img && <Picture class="svc-card__img" src={img} alt="" formats={['avif', 'webp']} widths={[420, 760]} sizes="(min-width: 1024px) 560px, (min-width: 640px) 50vw, 100vw" loading="lazy" />}
+  {img && <Picture class="svc-card__img" src={img} alt="" formats={['avif', 'webp']} widths={[420, 760]} sizes="(min-width: 1024px) 560px, (min-width: 640px) 50vw, 100vw" loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />}
   <div class="svc-card__body">
     {number
       ? <span class="svc-card__num" aria-hidden="true">{String(number).padStart(2, '0')}</span>

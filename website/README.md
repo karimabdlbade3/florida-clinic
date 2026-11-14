@@ -5,7 +5,7 @@ for Florida Dental Clinics: Kafr Negm, Ibrahimia (main) and Zagazig.
 
 - **Stack:** [Astro 7](https://astro.build) static site, no UI framework, about 2 KB of JavaScript on most pages (about 6 KB on the booking page).
 - **Output:** plain HTML/CSS/JS in `dist/`. It runs on any static host, with no server or database.
-- **Pages (30):** Home, About, Services + 6 service pages, Branches + 3 branch pages, Contact & Booking, Privacy, in Arabic (`/`) and English (`/en/`), plus a 404 page.
+- **Pages (34):** Home, About, Services + 8 service pages (the seven official categories plus general care), Branches + 3 branch pages, Contact & Booking, Privacy, in Arabic (`/`) and English (`/en/`), plus a 404 page.
 
 ## Run locally
 
@@ -31,6 +31,7 @@ npm run test:e2e          # full QA suite (needs Playwright + Chromium)
 | All interface text, page copy, SEO for main pages | `src/i18n/ui.ts` |
 | Brand name, tagline, working hours, booking WhatsApp, social links | `src/config/site.ts` |
 | Patient reviews (real, with consent only) | `src/data/testimonials.ts` |
+| Service card photos (temporary stock) | `src/assets/stock/` (see README there), registered in `src/data/media.ts` |
 | Photos | `src/assets/photos/` folders, registered in `src/data/media.ts` (see README there) |
 | Doctors / team | `src/data/team.ts` (section appears once filled) |
 | Logo | Official artwork in `src/assets/brand/florida-logo-original.png`. After replacing it run `node scripts/make-brand-assets.mjs` (regenerates header/footer logo, icons, Open Graph image) |
@@ -157,9 +158,10 @@ Organization, Dentist per branch (only verified fields), MedicalWebPage, FAQPage
 
 ## QA status (at handover)
 
-- `npm run test:e2e`: all checks pass: official business data (phones, maps, hours, WhatsApp, social links,
+- `npm run test:e2e`: 1017/1017 checks pass: official business data (phones, maps, hours, WhatsApp, social links,
   branch schema) in both languages, all 30 pages, no visible placeholders, no broken images, form validation and
   WhatsApp hand-off with every field preserved, endpoint success/failure, 404, sitemap, and no horizontal overflow
-  at 320 / 375 / 390 / 768 / 1024 / 1440 px.
+  at 320 / 375 / 390 / 768 / 1024 / 1440 px, the seven service categories in official order, navigation menus,
+  and the home page appointment form.
 - Lighthouse (mobile): Performance 99-100, Accessibility 100, Best Practices 100, SEO 100 on the five pages tested.
 - `npm audit`: 0 vulnerabilities.

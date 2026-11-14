@@ -28,7 +28,7 @@ const schema = [{
     <div class="container">
       <h2 id="main-services" class="sr-only">{d.services.title}</h2>
       <div class="svc-grid" data-main-services>
-        {mainServices.map((s, i) => <ServiceCard lang={lang} service={s} number={i + 1} delay={i % 4} />)}
+        {mainServices.map((s, i) => <ServiceCard lang={lang} service={s} number={i + 1} delay={i % 4} eager={i < 2} />)}
       </div>
     </div>
   </section>

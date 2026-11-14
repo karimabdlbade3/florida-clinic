@@ -5,6 +5,11 @@ import '@fontsource/ibm-plex-sans-arabic/600.css';
 import '@fontsource/cormorant-garamond/500.css';
 import '@fontsource/cormorant-garamond/600.css';
 import '../styles/global.css';
+// Preloaded so headings do not reflow when the web font arrives (layout stability).
+import displayFontEn from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff2?url';
+import bodyFontAr from '@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-600-normal.woff2?url';
+import bodyFontEn from '@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-latin-400-normal.woff2?url';
+import bodyFontEn500 from '@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-latin-500-normal.woff2?url';
 
 import type { Lang } from '../data/branches';
 import { languages, t } from '../i18n/ui';
@@ -57,6 +62,7 @@ const ldJson = (o: unknown) => JSON.stringify(o).replace(/</g, '\\u003c');
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {(lang === 'en' ? [displayFontEn, bodyFontEn, bodyFontEn500] : [bodyFontAr]).map((f) => <link rel="preload" as="font" type="font/woff2" href={f} crossorigin />)}
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
